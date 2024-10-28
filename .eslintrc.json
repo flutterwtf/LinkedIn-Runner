@@ -1,0 +1,48 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2023,
+    "sourceType": "module",
+    "project": "./tsconfig.main.json",
+    "ecmaFeatures": {
+      "jsx": true,
+      "tsx": true
+    }
+  },
+  "extends": [
+    "airbnb-base",
+    "airbnb-typescript/base",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:promise/recommended",
+    "prettier"
+  ],
+  "plugins": ["@typescript-eslint", "import", "n", "promise"],
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
+  },
+  "rules": {
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/lines-between-class-members": "off",
+    "object-property-newline": ["error", { "allowAllPropertiesOnSameLine": false }],
+    "implicit-arrow-linebreak": "off",
+    "no-await-in-loop": "off",
+    "class-methods-use-this": "off",
+    "@typescript-eslint/no-floating-promises": "warn",
+    "import/prefer-default-export": "off",
+    "import/no-cycle": "off",
+    "no-restricted-syntax": [
+      "off",
+      {
+        "selector": "ForOfStatement",
+        "message": "For-of loops are allowed."
+      }
+    ]
+  }
+}

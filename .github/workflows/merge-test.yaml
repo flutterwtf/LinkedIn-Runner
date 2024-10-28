@@ -1,0 +1,38 @@
+name: PR Merged -> test
+
+on:
+  push:
+    branches: ['test']
+
+jobs:
+  linting:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4.0.1
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm run ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+  deployment:
+    needs: linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.1
+
+      - name: Build Docker images
+        run: docker compose -f docker-compose-dev.yaml build
+
+      - name: Push Docker images
+        run: docker compose -f docker-compose-dev.yaml push
