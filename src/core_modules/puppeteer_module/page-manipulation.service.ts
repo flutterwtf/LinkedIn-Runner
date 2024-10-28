@@ -66,6 +66,7 @@ export class PageManipulationService {
     return browserPage.close();
   }
 
+  // переписать механизм чтобы cursor был привязан к page
   public createCursor(browserPage: Page): GhostCursor {
     return createCursor(browserPage, {
       x: generateRandomValue(300),
