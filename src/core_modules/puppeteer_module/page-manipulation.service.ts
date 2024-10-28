@@ -66,7 +66,6 @@ export class PageManipulationService {
     return browserPage.close();
   }
 
-  // переписать механизм чтобы cursor был привязан к page
   public createCursor(browserPage: Page): GhostCursor {
     return createCursor(browserPage, {
       x: generateRandomValue(300),
@@ -76,15 +75,6 @@ export class PageManipulationService {
 
   public getCurrentUrl(browserPage: Page): string {
     return browserPage.url();
-  }
-
-  public async querySelectorAll(
-    browserPage: Page,
-    selector: string,
-  ): Promise<Array<ElementHandle<Element>>> {
-    await browserPage.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
-
-    return browserPage.$$(selector);
   }
 
   public async evaluate<T>({
@@ -101,18 +91,6 @@ export class PageManipulationService {
     }
 
     return browserPage.evaluate(pageFunction, selector);
-  }
-
-  public async evaluateHandle<T>({
-    browserPage,
-    pageFunction,
-    selector,
-  }: {
-    browserPage: Page;
-    pageFunction: (selector: string | Element) => T | Promise<T>;
-    selector: string | ElementHandle<Element>;
-  }) {
-    return browserPage.evaluateHandle(pageFunction, selector);
   }
 
   public async multiEvaluate<T>({
