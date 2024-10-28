@@ -78,15 +78,6 @@ export class PageManipulationService {
     return browserPage.url();
   }
 
-  public async querySelector(
-    browserPage: Page,
-    selector: string,
-  ): Promise<ElementHandle<Element> | null> {
-    await browserPage.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
-
-    return browserPage.$(selector);
-  }
-
   public async querySelectorAll(
     browserPage: Page,
     selector: string,

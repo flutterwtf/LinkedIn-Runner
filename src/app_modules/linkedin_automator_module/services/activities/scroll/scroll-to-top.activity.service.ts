@@ -4,10 +4,11 @@ import { PageManipulationService } from '@core_modules/puppeteer_module/page-man
 import { IAccountTokenActivityInput } from '@app_modules/linkedin_automator_module/interfaces/activities/account-token-activity-input.interface';
 import { DefaultActivity } from '@app_modules/linkedin_automator_module/temporal/activities/default-activity.abstract';
 import { Activity } from 'nestjs-temporal';
-import { BrowserService } from '../browser.service';
+import { GhostCursor } from 'ghost-cursor';
+import { BrowserService } from '../../browser.service';
 
 @Injectable()
-export class ReloadPageActivity extends DefaultActivity {
+export class ScrollToTopActivity extends DefaultActivity {
   constructor(
     private readonly pageManipulationService: PageManipulationService,
     private readonly browserService: BrowserService,
@@ -16,22 +17,18 @@ export class ReloadPageActivity extends DefaultActivity {
   }
 
   @Activity()
-  public async actReloadPage({
-    accountToken,
-  }: IAccountTokenActivityInput<{ selector: string }>): Promise<void> {
-    const browserPage = this.prepare(accountToken);
-    const token = this.execute(browserPage);
+  public async actScrollToTop({ accountToken }: IAccountTokenActivityInput<object>): Promise<void> {
+    const [browserPage] = this.prepare(accountToken);
+    await this.execute(browserPage);
     this.check();
-
-    return token;
   }
 
-  protected override prepare(accountToken: string): Page {
-    return this.browserService.findPageByToken(accountToken)!;
+  protected override prepare(accountToken: string): [Page, GhostCursor] {
+    return this.browserService.findPageAndCursorByToken(accountToken)!;
   }
 
   protected override async execute(browserPage: Page): Promise<void> {
-    return this.pageManipulationService.reload(browserPage);
+    return this.pageManipulationService.scrollToTop(browserPage);
   }
 
   protected override check(): boolean {

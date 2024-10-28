@@ -1,43 +1,24 @@
+import { PageManipulationService } from '@core_modules/puppeteer_module/page-manipulation.service';
 import { hashObject } from '@common/utils/hash-object';
 import { Page } from 'puppeteer-core';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BrowserConnectionService } from '@core_modules/puppeteer_module/browser-connection.service';
-import { setTimeout } from 'timers/promises';
+import { GhostCursor } from 'ghost-cursor';
 
 @Injectable()
 export class BrowserService {
   private readonly connectionProfilePool: Map<string, string> = new Map();
-  private readonly connectionPool: Map<string, Page> = new Map();
+  // вынести потом наверно
+  private readonly connectionPool: Map<string, [Page, GhostCursor]> = new Map();
 
   constructor(
+    private readonly pageManipulationService: PageManipulationService,
     private readonly browserConnectionService: BrowserConnectionService,
-    private readonly logger: Logger,
   ) {}
-
-  public async recreateBrowser(token: string): Promise<Page> {
-    const currPage = this.findPageByToken(token)!;
-
-    await this.browserConnectionService.closeBrowser(currPage);
-    await setTimeout(3000);
-    await this.reconnectBrowser(token);
-
-    return this.findPageByToken(token)!;
-  }
-
-  public async reconnectBrowser(token: string): Promise<void> {
-    const currentPage = this.findPageByToken(token)!;
-    this.browserConnectionService.deleteFromBrowserMap(currentPage);
-
-    const profileId = this.connectionProfilePool.get(token)!;
-
-    const newPage = await this.connect(token, profileId);
-    this.updatePageByToken(token, newPage);
-    this.logger.log('Reconnected browser');
-  }
 
   public addToConnectionPool(page: Page): string {
     const token = hashObject(page);
-    this.connectionPool.set(token, page);
+    this.addNewConnection(token, page);
 
     return token;
   }
@@ -54,7 +35,7 @@ export class BrowserService {
     token: string;
   }> {
     const token = hashObject(config);
-    const browserPage = await this.connect(token, browserProfile);
+    const [browserPage] = await this.connect(token, browserProfile);
 
     return {
       browserPage,
@@ -62,7 +43,7 @@ export class BrowserService {
     };
   }
 
-  public findPageByToken(token: string): Page | undefined {
+  public findPageAndCursorByToken(token: string): [Page, GhostCursor] | undefined {
     return this.connectionPool.get(token);
   }
 
@@ -70,23 +51,15 @@ export class BrowserService {
     return [...this.connectionPool.keys()];
   }
 
-  public async recreatePageAndUpdatePool(token: string): Promise<Page> {
-    const currPage = this.findPageByToken(token)!;
-    const newPage = await this.browserConnectionService.recreatePage(currPage);
-    this.updatePageByToken(token, newPage);
-
-    return newPage;
-  }
-
-  private async connect(token: string, profileId: string): Promise<Page> {
+  private async connect(token: string, profileId: string): Promise<[Page, GhostCursor]> {
     this.connectionProfilePool.set(token, profileId);
     const page = await this.browserConnectionService.connect(profileId);
-    this.connectionPool.set(token, page);
+    this.addNewConnection(token, page);
 
     return this.connectionPool.get(token)!;
   }
 
-  private updatePageByToken(token: string, page: Page): void {
-    this.connectionPool.set(token, page)!;
+  private addNewConnection(token: string, page: Page): void {
+    this.connectionPool.set(token, [page, this.pageManipulationService.createCursor(page)]);
   }
 }

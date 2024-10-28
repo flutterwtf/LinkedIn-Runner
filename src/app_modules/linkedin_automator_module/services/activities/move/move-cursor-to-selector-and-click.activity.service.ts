@@ -4,12 +4,12 @@ import { PageManipulationService } from '@core_modules/puppeteer_module/page-man
 import { BrowserService } from '@app_modules/linkedin_automator_module/services/browser.service';
 import { IAccountTokenActivityInput } from '@app_modules/linkedin_automator_module/interfaces/activities/account-token-activity-input.interface';
 import { Activities, Activity } from 'nestjs-temporal';
-import { setTimeout } from 'timers/promises';
 import { DefaultActivity } from '@app_modules/linkedin_automator_module/temporal/activities/default-activity.abstract';
+import { GhostCursor } from 'ghost-cursor';
 
 @Injectable()
 @Activities()
-export class GetCurrentUrlActivity extends DefaultActivity {
+export class MoveCursorToSelectorAndClickActivity extends DefaultActivity {
   constructor(
     private readonly pageManipulationService: PageManipulationService,
     private readonly browserService: BrowserService,
@@ -18,23 +18,21 @@ export class GetCurrentUrlActivity extends DefaultActivity {
   }
 
   @Activity()
-  public async actGetCurrentUrl({
+  public async actMoveCursorToSelectorAndClick({
     accountToken,
-  }: IAccountTokenActivityInput<object>): Promise<string> {
-    const browserPage = this.prepare(accountToken);
-    await setTimeout(5000);
-    const result = this.execute(browserPage);
+    input: { selector },
+  }: IAccountTokenActivityInput<{ selector: string }>): Promise<void> {
+    const [, cursor] = this.prepare(accountToken);
+    await this.execute(cursor, selector);
     this.check();
-
-    return result;
   }
 
-  protected override prepare(accountToken: string): Page {
-    return this.browserService.findPageByToken(accountToken)!;
+  protected override prepare(accountToken: string): [Page, GhostCursor] {
+    return this.browserService.findPageAndCursorByToken(accountToken)!;
   }
 
-  protected override execute(browserPage: Page): string {
-    return this.pageManipulationService.getCurrentUrl(browserPage);
+  protected override async execute(cursor: GhostCursor, selector: string): Promise<void> {
+    return this.pageManipulationService.moveCursorToSelectorAndClick(cursor, selector);
   }
 
   protected override check(): boolean {
