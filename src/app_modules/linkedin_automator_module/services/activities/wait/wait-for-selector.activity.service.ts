@@ -2,11 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { Page } from 'puppeteer-core';
 import { IAccountTokenActivityInput } from '@app_modules/linkedin_automator_module/interfaces/activities/account-token-activity-input.interface';
 import { DefaultActivity } from '@app_modules/linkedin_automator_module/temporal/activities/default-activity.abstract';
-import { Activity } from 'nestjs-temporal';
+import { Activities, Activity } from 'nestjs-temporal';
 import { GhostCursor } from 'ghost-cursor';
 import { BrowserService } from '../../browser.service';
 
 @Injectable()
+@Activities()
 export class WaitForSelectorActivity extends DefaultActivity {
   private readonly waitingSelectorTimeout = 20000;
 

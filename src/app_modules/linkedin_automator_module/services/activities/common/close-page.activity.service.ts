@@ -7,8 +7,8 @@ import { PageManipulationService } from '@core_modules/puppeteer_module/page-man
 import { DefaultActivity } from '../../../temporal/activities/default-activity.abstract';
 import { BrowserService } from '../../browser.service';
 
-@Activities()
 @Injectable()
+@Activities()
 export class ClosePageActivity extends DefaultActivity {
   constructor(
     private readonly pageManipulationService: PageManipulationService,
