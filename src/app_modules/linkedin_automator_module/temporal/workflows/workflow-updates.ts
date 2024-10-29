@@ -2,30 +2,30 @@ import { defineUpdate } from '@temporalio/workflow';
 import { IEvaluateActivityInput } from '../activities/interfaces/evaluate-activity-input.interface';
 import { IMultiEvaluateActivityInput } from '../activities/interfaces/multi-evaluate-activity-input.interface';
 import { ISelector } from '../activities/interfaces/common/selector.interface';
+import { ITimeout } from '../activities/interfaces/common/timeout.interface';
 
 export const workflowUpdates = {
-  clickOnSelectorAndOpenNewPage: defineUpdate<unknown, [ISelector]>(
-    'clickOnSelectorAndOpenNewPage',
-  ),
-  closePage: defineUpdate<unknown, [object]>('closePage'),
-  getCurrentUrl: defineUpdate<unknown, [object]>('getCurrentUrl'),
-  reloadPage: defineUpdate<unknown, [object]>('reloadPage'),
+  clickOnSelectorAndOpenNewPage: defineUpdate<string, [ISelector]>('clickOnSelectorAndOpenNewPage'),
+  closePage: defineUpdate<void, [object]>('closePage'),
+  getCurrentUrl: defineUpdate<string, [object]>('getCurrentUrl'),
+  isPageClosed: defineUpdate<boolean, [object]>('isPageClosed'),
+  reloadPage: defineUpdate<void, [object]>('reloadPage'),
   evaluate: defineUpdate<unknown, [IEvaluateActivityInput]>('evaluate'),
   multiEvaluate: defineUpdate<unknown, [IMultiEvaluateActivityInput]>('multiEvaluate'),
-  extractLinksFromSelector: defineUpdate<unknown, [ISelector]>('extractLinksFromSelector'),
-  extractSelectorContent: defineUpdate<unknown, [ISelector]>('extractSelectorContent'),
-  extractTextsFromSelector: defineUpdate<unknown, [ISelector]>('extractTextsFromSelector'),
-  goBack: defineUpdate<unknown, [object]>('goBack'),
-  goToPage: defineUpdate<unknown, [{ page: string }]>('goToPage'),
-  moveCursorAndScrollRandomly: defineUpdate<unknown, [object]>('moveCursorAndScrollRandomly'),
-  moveCursorToSelectorAndClick: defineUpdate<unknown, [ISelector]>('moveCursorToSelectorAndClick'),
-  moveCursorToSelectorAndType: defineUpdate<unknown, [{ text: string }]>(
+  extractLinksFromSelector: defineUpdate<Array<string>, [ISelector]>('extractLinksFromSelector'),
+  extractSelectorContent: defineUpdate<string, [ISelector]>('extractSelectorContent'),
+  extractTextsFromSelector: defineUpdate<Array<string>, [ISelector]>('extractTextsFromSelector'),
+  goBack: defineUpdate<void, [object]>('goBack'),
+  goToPage: defineUpdate<void, [{ page: string }]>('goToPage'),
+  moveCursorAndScrollRandomly: defineUpdate<void, [object]>('moveCursorAndScrollRandomly'),
+  moveCursorToSelectorAndClick: defineUpdate<void, [ISelector]>('moveCursorToSelectorAndClick'),
+  moveCursorToSelectorAndType: defineUpdate<void, [{ text: string }]>(
     'moveCursorToSelectorAndType',
   ),
-  scrollBy: defineUpdate<unknown, [object]>('scrollBy'),
-  scrollToTop: defineUpdate<unknown, [object]>('scrollToTop'),
-  waitAndCheckIfSelectorExists: defineUpdate<unknown, [{ timeout: number } & ISelector]>(
+  scrollBy: defineUpdate<number, [object]>('scrollBy'),
+  scrollToTop: defineUpdate<void, [object]>('scrollToTop'),
+  waitAndCheckIfSelectorExists: defineUpdate<boolean, [ITimeout & ISelector]>(
     'waitAndCheckIfSelectorExists',
   ),
-  waitForSelector: defineUpdate<unknown, [{ timeout: number } & ISelector]>('waitForSelector'),
+  waitForSelector: defineUpdate<void, [ITimeout & ISelector]>('waitForSelector'),
 };
