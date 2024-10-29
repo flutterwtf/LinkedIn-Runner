@@ -1,14 +1,14 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { GLOBAL_ERROR_MESSAGE } from '@common/errors/global-error-message';
 import { ERROR_MESSAGE } from '@core_modules/proxy_module/errors/error-message';
-import { FiberyDataSource } from '../fibery.datasource';
-import { TFiberyCacheType } from '../constants/fibery-cache-type';
-import { FIBERY_CACHE_PRIVACY } from '../constants/fibery-cache-privacy';
+import { TCacheType } from '@app_modules/linkedin_automator_module/constants/cache-type';
+import { CACHE_PRIVACY } from '@app_modules/linkedin_automator_module/constants/cache-privacy';
 import { IFiberyId } from '../interfaces/common/fibery-id.interface';
 import { FiberyUtils } from '../utils/fibery-utils';
 import { FiberyLinkedInAutomatorAccountService } from './fibery-linkedin-automator-account.service';
 import { FIBERY_DOCUMENT_FORMAT } from '../constants/fibery-document-format';
 import { IFiberyCacheValueSecret } from '../interfaces/fibery-cache-value-secret.interface';
+import { FiberyDataSource } from '../fibery.datasource';
 
 @Injectable()
 export class FiberyLinkedinAutomatorCacheService {
@@ -25,7 +25,7 @@ export class FiberyLinkedinAutomatorCacheService {
   }: {
     key: string;
     token?: string;
-    type: TFiberyCacheType;
+    type: TCacheType;
   }): Promise<string | undefined> {
     if (token) {
       const privateCache = await this.getPrivateCache(key, token, type);
@@ -37,7 +37,7 @@ export class FiberyLinkedinAutomatorCacheService {
     return this.getPublicCacheByKey(key, type);
   }
 
-  public async getCacheByValue(value: string, type: TFiberyCacheType): Promise<string | undefined> {
+  public async getCacheByValue(value: string, type: TCacheType): Promise<string | undefined> {
     return this.getPublicCacheByValue(value, type);
   }
 
@@ -48,7 +48,7 @@ export class FiberyLinkedinAutomatorCacheService {
     value,
   }: {
     token: string;
-    type: TFiberyCacheType;
+    type: TCacheType;
     key: string;
     value: string;
   }): Promise<void> {
@@ -74,7 +74,7 @@ export class FiberyLinkedinAutomatorCacheService {
     key,
     value,
   }: {
-    type: TFiberyCacheType;
+    type: TCacheType;
     key: string;
     value: string;
   }): Promise<void> {
@@ -93,10 +93,7 @@ export class FiberyLinkedinAutomatorCacheService {
     await this.getSecretAndAttachCacheValue(cacheId, value);
   }
 
-  private async getPublicCacheByKey(
-    key: string,
-    type: TFiberyCacheType,
-  ): Promise<string | undefined> {
+  private async getPublicCacheByKey(key: string, type: TCacheType): Promise<string | undefined> {
     return this.getPublicCache({
       key,
       type,
@@ -106,7 +103,7 @@ export class FiberyLinkedinAutomatorCacheService {
 
   private async getPublicCacheByValue(
     value: string,
-    type: TFiberyCacheType,
+    type: TCacheType,
   ): Promise<string | undefined> {
     return this.getPublicCache({
       key: value,
@@ -121,7 +118,7 @@ export class FiberyLinkedinAutomatorCacheService {
     isKeySearch,
   }: {
     key: string;
-    type: TFiberyCacheType;
+    type: TCacheType;
     isKeySearch: boolean;
   }): Promise<string | undefined> {
     const data = await this.fiberyDataSource.queryEntity<Array<IFiberyCacheValueSecret>>(
@@ -154,7 +151,7 @@ export class FiberyLinkedinAutomatorCacheService {
       {
         $type: type,
         $searchValue: key,
-        $privacy: FIBERY_CACHE_PRIVACY.public,
+        $privacy: CACHE_PRIVACY.public,
       },
     );
 
@@ -175,7 +172,7 @@ export class FiberyLinkedinAutomatorCacheService {
   private async getPrivateCache(
     key: string,
     token: string,
-    type: TFiberyCacheType,
+    type: TCacheType,
   ): Promise<string | undefined> {
     const data = await this.fiberyDataSource.queryEntity<Array<IFiberyCacheValueSecret>>(
       {
@@ -202,7 +199,7 @@ export class FiberyLinkedinAutomatorCacheService {
         $type: type,
         $token: token,
         $key: key,
-        $privacy: FIBERY_CACHE_PRIVACY.private,
+        $privacy: CACHE_PRIVACY.private,
       },
     );
 
@@ -269,7 +266,7 @@ export class FiberyLinkedinAutomatorCacheService {
     return createdCache[0]?.['fibery/id'];
   }
 
-  private async fetchCacheTypeIdByName(name: TFiberyCacheType): Promise<string> {
+  private async fetchCacheTypeIdByName(name: TCacheType): Promise<string> {
     const data = await this.fiberyDataSource.queryEntity<Array<IFiberyId>>(
       {
         'q/from': 'LinkedIn Automation/Cache Type',
@@ -312,11 +309,11 @@ export class FiberyLinkedinAutomatorCacheService {
   }
 
   private async fetchPublicPrivacyId(): Promise<string> {
-    return this.fetchPrivacyIdByName(FIBERY_CACHE_PRIVACY.public);
+    return this.fetchPrivacyIdByName(CACHE_PRIVACY.public);
   }
 
   private async fetchPrivatePrivacyId(): Promise<string> {
-    return this.fetchPrivacyIdByName(FIBERY_CACHE_PRIVACY.private);
+    return this.fetchPrivacyIdByName(CACHE_PRIVACY.private);
   }
 
   private async fetchPrivacyIdByName(name: string): Promise<string> {

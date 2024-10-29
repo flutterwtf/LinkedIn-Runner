@@ -1,6 +1,7 @@
 import { ClickOnSelectorAndOpenNewPageActivity } from '@app_modules/linkedin_automator_module/services/activities/common/click-on-selector-and-open-new-page.activity.service';
 import { ClosePageActivity } from '@app_modules/linkedin_automator_module/services/activities/common/close-page.activity.service';
 import { GetCurrentUrlActivity } from '@app_modules/linkedin_automator_module/services/activities/common/get-current-url.activity.service';
+import { IsPageClosedActivity } from '@app_modules/linkedin_automator_module/services/activities/common/is-page-closed.activity.service';
 import { ReloadPageActivity } from '@app_modules/linkedin_automator_module/services/activities/common/reload-page.activity.service';
 import { EvaluateActivity } from '@app_modules/linkedin_automator_module/services/activities/evaluate/evalutate.activity.service';
 import { MultiEvaluateActivity } from '@app_modules/linkedin_automator_module/services/activities/evaluate/multi-evaluate.activity.service';
@@ -21,6 +22,7 @@ export const activitiesBundle = [
   ClickOnSelectorAndOpenNewPageActivity,
   ClosePageActivity,
   GetCurrentUrlActivity,
+  IsPageClosedActivity,
   ReloadPageActivity,
   EvaluateActivity,
   MultiEvaluateActivity,

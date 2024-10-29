@@ -17,6 +17,7 @@ import { GetCurrentUrlActivity } from '@app_modules/linkedin_automator_module/se
 import { ReloadPageActivity } from '@app_modules/linkedin_automator_module/services/activities/common/reload-page.activity.service';
 import { ScrollByActivity } from '@app_modules/linkedin_automator_module/services/activities/scroll/scroll-by.activity.service';
 import { WaitAndCheckIfSelectorExistsActivity } from '@app_modules/linkedin_automator_module/services/activities/wait/wait-and-check-if-selector-exists.activity.service';
+import { IsPageClosedActivity } from '@app_modules/linkedin_automator_module/services/activities/common/is-page-closed.activity.service';
 import { defaultActivityConfig } from './configs/default-activity.config';
 
 // Common
@@ -24,6 +25,7 @@ export const { actClickOnSelectorAndOpenNewPage } =
   proxyActivities<ClickOnSelectorAndOpenNewPageActivity>(defaultActivityConfig);
 export const { actClosePage } = proxyActivities<ClosePageActivity>(defaultActivityConfig);
 export const { actGetCurrentUrl } = proxyActivities<GetCurrentUrlActivity>(defaultActivityConfig);
+export const { actIsPageClosed } = proxyActivities<IsPageClosedActivity>(defaultActivityConfig);
 export const { actReloadPage } = proxyActivities<ReloadPageActivity>(defaultActivityConfig);
 
 // Evaluate
