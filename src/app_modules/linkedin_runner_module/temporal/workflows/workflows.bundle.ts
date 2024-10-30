@@ -23,7 +23,7 @@ import { createActivityInput } from '../activities/utils/create-activity-input';
 import { IMultiEvaluateActivityInput } from '../activities/interfaces/multi-evaluate-activity-input.interface';
 import { workflowUpdates } from './workflow-updates';
 import { IEvaluateActivityInput } from '../activities/interfaces/evaluate-activity-input.interface';
-import { ISelector } from '../activities/interfaces/common/selector.interface';
+import { ISelector } from '../../interfaces/common/selector.interface';
 
 export async function pageManipulationWorkflow({
   accountToken,

@@ -1,8 +1,8 @@
 import { defineUpdate } from '@temporalio/workflow';
 import { IEvaluateActivityInput } from '../activities/interfaces/evaluate-activity-input.interface';
 import { IMultiEvaluateActivityInput } from '../activities/interfaces/multi-evaluate-activity-input.interface';
-import { ISelector } from '../activities/interfaces/common/selector.interface';
-import { ITimeout } from '../activities/interfaces/common/timeout.interface';
+import { ISelector } from '../../interfaces/common/selector.interface';
+import { ITimeout } from '../../interfaces/common/timeout.interface';
 
 export const workflowUpdates = {
   clickOnSelectorAndOpenNewPage: defineUpdate<string, [ISelector]>('clickOnSelectorAndOpenNewPage'),
@@ -28,4 +28,4 @@ export const workflowUpdates = {
     'waitAndCheckIfSelectorExists',
   ),
   waitForSelector: defineUpdate<void, [ITimeout & ISelector]>('waitForSelector'),
-};
+} as const;

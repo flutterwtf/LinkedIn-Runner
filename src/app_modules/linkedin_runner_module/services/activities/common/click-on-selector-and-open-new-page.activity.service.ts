@@ -1,6 +1,6 @@
 import { Activities, Activity } from 'nestjs-temporal';
 import { IAccountTokenActivityInput } from '@app_modules/linkedin_runner_module/interfaces/activities/account-token-activity-input.interface';
-import { ISelector } from '@app_modules/linkedin_runner_module/temporal/activities/interfaces/common/selector.interface';
+import { ISelector } from '@app_modules/linkedin_runner_module/interfaces/common/selector.interface';
 import { Injectable } from '@nestjs/common';
 import { GhostCursor } from 'ghost-cursor';
 import { Page } from 'puppeteer-core';
