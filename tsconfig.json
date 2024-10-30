@@ -34,7 +34,6 @@
       "@core_modules/*": ["./src/core_modules/*"],
       "@app_modules/*": ["./src/app_modules/*"],
       "@common/*": ["./src/common/*"],
-      "@erp_module/*": ["./src/app_modules/linkedin_automator_module/modules/erp_module/*"] 
     }
   },
   "exclude": ["node_modules", "**/node_modules/*", "./build", "**/dist/*"],

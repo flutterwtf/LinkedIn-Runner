@@ -6,12 +6,12 @@ import { TAccountConnectionStatus } from '../constants/account-connection-type';
 import { IOfflineAccount } from '../interfaces/offline-account.interface';
 
 @Injectable()
-export class ErpAccountsService {
+export class LinkedInLogicAccountsService {
   private readonly axios: AxiosInstance;
 
   constructor(private readonly configService: ConfigService) {
-    const apiToken = this.configService.getOrThrow<string>('erpConfig.apiToken');
-    const hostUrl = this.configService.getOrThrow<string>('erpConfig.hostUrl');
+    const apiToken = this.configService.getOrThrow<string>('linkedInLogic.apiToken');
+    const hostUrl = this.configService.getOrThrow<string>('linkedInLogic.hostUrl');
 
     this.axios = axios.create({
       baseURL: `${hostUrl}/linkedin/automator/accounts`,

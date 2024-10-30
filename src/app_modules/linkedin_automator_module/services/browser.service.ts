@@ -8,7 +8,6 @@ import { GhostCursor } from 'ghost-cursor';
 @Injectable()
 export class BrowserService {
   private readonly connectionProfilePool: Map<string, string> = new Map();
-  // вынести потом наверно
   private readonly connectionPool: Map<string, [Page, GhostCursor]> = new Map();
 
   constructor(

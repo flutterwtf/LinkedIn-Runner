@@ -1,12 +1,5 @@
 export const SOURCE = {
-  tasksService: 'Tasks Service',
+  connection: 'Connection',
   exceptionFilter: 'App Exception Filter',
   loggerMiddleware: 'Logger Middleware',
-  cron: 'Cron',
-  taskRunning: 'Task Running',
-  connection: 'Connection',
-  appBootstrapFunc: 'Application Bootstrap Function',
-  browserRecreation: 'Browser Recreation',
-  screenshotAttachment: 'Screenshot Attachment',
-  cache: 'Cache',
 } as const;

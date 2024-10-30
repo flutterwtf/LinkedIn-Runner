@@ -16,8 +16,7 @@ import { activitiesBundle } from '@app_modules/linkedin_automator_module/tempora
         const grpcEndpoint = configService.getOrThrow<string>('temporalConfig.grpcEndpoint');
         const apiKey = configService.getOrThrow<string>('temporalConfig.apiKey');
         const namespace = configService.getOrThrow<string>('temporalConfig.namespace');
-        // потом поменять
-        const taskQueue = 'runner-queue';
+        const taskQueue = configService.getOrThrow<string>('temporalConfig.taskQueue');
 
         Runtime.install({});
 
@@ -41,10 +40,6 @@ import { activitiesBundle } from '@app_modules/linkedin_automator_module/tempora
                 '@core_modules': path.resolve(__dirname, '../../../../core_modules'),
                 '@app_modules': path.resolve(__dirname, '../../../../app_modules'),
                 '@common': path.resolve(__dirname, '../../../../common'),
-                '@erp_module': path.resolve(
-                  __dirname,
-                  '../../../../app_modules/linkedin_automator_module/modules/erp_module',
-                ),
               },
             },
           }),
