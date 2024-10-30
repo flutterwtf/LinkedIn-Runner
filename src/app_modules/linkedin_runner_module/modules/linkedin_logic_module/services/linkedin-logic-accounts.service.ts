@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
 import { SuccessResponse } from '../models/success-response.model';
-import { TAccountConnectionStatus } from '../constants/account-connection-type';
+import { TAccountConnectionStatus } from '../constants/account-connection-status';
 import { IOfflineAccount } from '../interfaces/offline-account.interface';
 
 @Injectable()

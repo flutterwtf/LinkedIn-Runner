@@ -4,7 +4,7 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-export async function killProcessOnPort(port: number, logger: Logger) {
+export async function killProcessOnPort(port: number, logger: Logger): Promise<void> {
   try {
     await execAsync(`lsof -ti:${port} | xargs kill -9`);
     logger.log(`Process on port ${port} killed successfully.`);

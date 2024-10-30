@@ -6,7 +6,7 @@ import { SOURCE } from '../logging/source';
 export class LoggerMiddleware implements NestMiddleware {
   constructor(private readonly logger: Logger) {}
 
-  use(req: Request, res: Response, next: NextFunction) {
+  use(req: Request, _: Response, next: NextFunction): void {
     const info = {
       method: req.method,
       originalUrl: req.originalUrl,

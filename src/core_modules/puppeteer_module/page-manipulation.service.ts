@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { generateRandomValue } from '@common/utils/get-random-value';
+import { generateRandomValue } from '@common/utils/generate-random-value';
 import { GhostCursor, createCursor } from 'ghost-cursor';
 import { ElementHandle, Page } from 'puppeteer-core';
 import { CursorUtil } from './utils/cursor-util';

@@ -18,10 +18,10 @@ import {
   actScrollToTop,
   actWaitAndCheckIfSelectorExists,
   actWaitForSelector,
-} from '../activities/activies.export';
+} from '../activities/activities.export';
 import { createActivityInput } from '../activities/utils/create-activity-input';
 import { IMultiEvaluateActivityInput } from '../activities/interfaces/multi-evaluate-activity-input.interface';
-import { workflowUpdates } from './workflow-updates';
+import { WORKFLOW_UPDATES } from './workflow-updates';
 import { IEvaluateActivityInput } from '../activities/interfaces/evaluate-activity-input.interface';
 import { ISelector } from '../../interfaces/common/selector.interface';
 
@@ -63,7 +63,7 @@ export async function pageManipulationWorkflow({
       actWaitForSelector(createActivityInput(accountToken, input)),
   };
 
-  Object.entries(workflowUpdates).forEach(([key, update]) => {
+  Object.entries(WORKFLOW_UPDATES).forEach(([key, update]) => {
     setHandler(update, async (input: unknown) =>
       handlers[key as keyof typeof handlers](input as never),
     );

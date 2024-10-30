@@ -30,7 +30,7 @@ import { activitiesBundle } from '@app_modules/linkedin_runner_module/temporal/a
         });
 
         const bundle = await bundleWorkflowCode({
-          workflowsPath: require.resolve('../../temporal/workflows/workflows.bundle'),
+          workflowsPath: require.resolve('../../temporal/workflows/page-manipulation.workflow'),
           webpackConfigHook: (config) => ({
             ...config,
             resolve: {

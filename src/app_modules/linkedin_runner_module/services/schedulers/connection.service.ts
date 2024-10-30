@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { SOURCE } from '@common/logging/source';
-import { ACCOUNT_CONNECTION_STATUS } from '@app_modules/linkedin_runner_module/modules/linkedin_logic_module/constants/account-connection-type';
+import { ACCOUNT_CONNECTION_STATUS } from '@app_modules/linkedin_runner_module/modules/linkedin_logic_module/constants/account-connection-status';
 import { LinkedInLogicAccountsService } from '../../modules/linkedin_logic_module/services/linkedin-logic-accounts.service';
 import { BrowserService } from '../browser.service';
 
