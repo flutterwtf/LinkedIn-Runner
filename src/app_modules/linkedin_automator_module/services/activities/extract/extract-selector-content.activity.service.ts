@@ -37,7 +37,5 @@ export class ExtractSelectorContentActivity extends DefaultActivity {
     return this.pageManipulationService.parseSelectorContent(browserPage, selector);
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

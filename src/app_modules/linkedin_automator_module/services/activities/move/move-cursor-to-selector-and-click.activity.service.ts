@@ -35,7 +35,5 @@ export class MoveCursorToSelectorAndClickActivity extends DefaultActivity {
     return this.pageManipulationService.moveCursorToSelectorAndClick(cursor, selector);
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

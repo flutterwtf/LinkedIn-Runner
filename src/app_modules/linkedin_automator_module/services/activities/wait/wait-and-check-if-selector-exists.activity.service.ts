@@ -55,7 +55,5 @@ export class WaitAndCheckIfSelectorExistsActivity extends DefaultActivity {
     });
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

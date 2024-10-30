@@ -32,7 +32,5 @@ export class ReloadPageActivity extends DefaultActivity {
     return this.pageManipulationService.reload(browserPage);
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

@@ -36,7 +36,5 @@ export class GetCurrentUrlActivity extends DefaultActivity {
     return this.pageManipulationService.getCurrentUrl(browserPage);
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

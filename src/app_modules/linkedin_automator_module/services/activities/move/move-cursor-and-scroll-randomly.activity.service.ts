@@ -34,7 +34,5 @@ export class MoveCursorAndScrollRandomlyActivity extends DefaultActivity {
     return this.pageManipulationService.moveCursorAndScrollRandomly(browserPage, cursor);
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

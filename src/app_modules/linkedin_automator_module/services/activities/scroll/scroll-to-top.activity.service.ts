@@ -32,7 +32,5 @@ export class ScrollToTopActivity extends DefaultActivity {
     return this.pageManipulationService.scrollToTop(browserPage);
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

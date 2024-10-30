@@ -37,7 +37,5 @@ export class ExtractTextsFromSelectorActivity extends DefaultActivity {
     return this.pageManipulationService.extractTextsFromSelector(browserPage, selector);
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

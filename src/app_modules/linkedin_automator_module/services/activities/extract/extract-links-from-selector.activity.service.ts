@@ -37,7 +37,5 @@ export class ExtractLinksFromSelectorActivity extends DefaultActivity {
     return this.pageManipulationService.extractLinksFromSelector(browserPage, selector);
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

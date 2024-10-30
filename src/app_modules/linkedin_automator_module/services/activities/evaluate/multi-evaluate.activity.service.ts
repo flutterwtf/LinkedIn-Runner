@@ -56,7 +56,5 @@ export class MultiEvaluateActivity extends DefaultActivity {
     });
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

@@ -33,7 +33,5 @@ export class ClosePageActivity extends DefaultActivity {
     return this.browserService.findPageAndCursorByToken(accountToken)!;
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

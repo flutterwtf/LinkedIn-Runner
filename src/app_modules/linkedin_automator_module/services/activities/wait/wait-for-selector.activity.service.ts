@@ -45,7 +45,5 @@ export class WaitForSelectorActivity extends DefaultActivity {
     await browserPage.waitForSelector(selector, { timeout });
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

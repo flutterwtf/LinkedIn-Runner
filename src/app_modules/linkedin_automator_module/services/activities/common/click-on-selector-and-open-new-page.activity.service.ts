@@ -1,5 +1,6 @@
 import { Activities, Activity } from 'nestjs-temporal';
 import { IAccountTokenActivityInput } from '@app_modules/linkedin_automator_module/interfaces/activities/account-token-activity-input.interface';
+import { ISelector } from '@app_modules/linkedin_automator_module/temporal/activities/interfaces/common/selector.interface';
 import { Injectable } from '@nestjs/common';
 import { GhostCursor } from 'ghost-cursor';
 import { Page } from 'puppeteer-core';
@@ -21,7 +22,7 @@ export class ClickOnSelectorAndOpenNewPageActivity extends DefaultActivity {
   public async actClickOnSelectorAndOpenNewPage({
     accountToken,
     input: { selector },
-  }: IAccountTokenActivityInput<{ selector: string }>): Promise<string> {
+  }: IAccountTokenActivityInput<ISelector>): Promise<string> {
     const [browserPage, cursor] = this.prepare(accountToken);
     const token = this.execute({
       browserPage,
@@ -55,7 +56,5 @@ export class ClickOnSelectorAndOpenNewPageActivity extends DefaultActivity {
     return this.browserService.findPageAndCursorByToken(accountToken)!;
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

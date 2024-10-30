@@ -32,7 +32,5 @@ export class GoBackActivity extends DefaultActivity {
     return this.pageManipulationService.goBack(browserPage);
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

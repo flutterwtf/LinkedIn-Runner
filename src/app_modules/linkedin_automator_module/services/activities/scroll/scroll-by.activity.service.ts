@@ -34,7 +34,5 @@ export class ScrollByActivity extends DefaultActivity {
     return this.pageManipulationService.scrollBy(browserPage);
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

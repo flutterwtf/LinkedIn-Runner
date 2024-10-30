@@ -35,7 +35,5 @@ export class GoToPageActivity extends DefaultActivity {
     return this.pageManipulationService.goToPage(browserPage, page);
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }

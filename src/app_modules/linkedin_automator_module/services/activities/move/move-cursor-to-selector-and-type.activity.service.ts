@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Page } from 'puppeteer-core';
 import { PageManipulationService } from '@core_modules/puppeteer_module/page-manipulation.service';
 import { IAccountTokenActivityInput } from '@app_modules/linkedin_automator_module/interfaces/activities/account-token-activity-input.interface';
+import { ISelector } from '@app_modules/linkedin_automator_module/temporal/activities/interfaces/common/selector.interface';
 import { DefaultActivity } from '@app_modules/linkedin_automator_module/temporal/activities/default-activity.abstract';
 import { Activities, Activity } from 'nestjs-temporal';
 import { GhostCursor } from 'ghost-cursor';
@@ -21,7 +22,7 @@ export class MoveCursorToSelectorAndTypeActivity extends DefaultActivity {
   public async actMoveCursorToSelectorAndType({
     accountToken,
     input: { selector, text },
-  }: IAccountTokenActivityInput<{ selector: string; text: string }>): Promise<void> {
+  }: IAccountTokenActivityInput<ISelector & { text: string }>): Promise<void> {
     const [browserPage, cursor] = this.prepare(accountToken);
     await this.execute({
       browserPage,
@@ -55,7 +56,5 @@ export class MoveCursorToSelectorAndTypeActivity extends DefaultActivity {
     });
   }
 
-  protected override check(): boolean {
-    return true;
-  }
+  protected override check(): void {}
 }
