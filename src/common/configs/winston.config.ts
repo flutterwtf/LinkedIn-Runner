@@ -7,7 +7,7 @@ export const winstonConfig = {
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.ms(),
-        nestWinstonModuleUtilities.format.nestLike('LinkedIn Automator', {
+        nestWinstonModuleUtilities.format.nestLike('LinkedIn Runner', {
           colors: true,
           prettyPrint: true,
         }),

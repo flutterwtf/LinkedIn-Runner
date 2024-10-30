@@ -1,8 +1,8 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { GLOBAL_ERROR_MESSAGE } from '@common/errors/global-error-message';
 import { ERROR_MESSAGE } from '@core_modules/proxy_module/errors/error-message';
-import { TCacheType } from '@app_modules/linkedin_automator_module/constants/cache-type';
-import { CACHE_PRIVACY } from '@app_modules/linkedin_automator_module/constants/cache-privacy';
+import { TCacheType } from '@app_modules/linkedin_runner_module/constants/cache-type';
+import { CACHE_PRIVACY } from '@app_modules/linkedin_runner_module/constants/cache-privacy';
 import { IFiberyId } from '../interfaces/common/fibery-id.interface';
 import { FiberyUtils } from '../utils/fibery-utils';
 import { FiberyLinkedInAutomatorAccountService } from './fibery-linkedin-automator-account.service';

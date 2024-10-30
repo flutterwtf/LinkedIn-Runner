@@ -1,0 +1,36 @@
+import { Injectable } from '@nestjs/common';
+import { Page } from 'puppeteer-core';
+import { PageManipulationService } from '@core_modules/puppeteer_module/page-manipulation.service';
+import { IAccountTokenActivityInput } from '@app_modules/linkedin_runner_module/interfaces/activities/account-token-activity-input.interface';
+import { DefaultActivity } from '@app_modules/linkedin_runner_module/temporal/activities/default-activity.abstract';
+import { Activities, Activity } from 'nestjs-temporal';
+import { GhostCursor } from 'ghost-cursor';
+import { BrowserService } from '../../browser.service';
+
+@Injectable()
+@Activities()
+export class ReloadPageActivity extends DefaultActivity {
+  constructor(
+    private readonly pageManipulationService: PageManipulationService,
+    private readonly browserService: BrowserService,
+  ) {
+    super();
+  }
+
+  @Activity()
+  public async actReloadPage({ accountToken }: IAccountTokenActivityInput<object>): Promise<void> {
+    const [browserPage] = this.prepare(accountToken);
+    await this.execute(browserPage);
+    this.check();
+  }
+
+  protected override prepare(accountToken: string): [Page, GhostCursor] {
+    return this.browserService.findPageAndCursorByToken(accountToken)!;
+  }
+
+  protected override async execute(browserPage: Page): Promise<void> {
+    return this.pageManipulationService.reload(browserPage);
+  }
+
+  protected override check(): void {}
+}
