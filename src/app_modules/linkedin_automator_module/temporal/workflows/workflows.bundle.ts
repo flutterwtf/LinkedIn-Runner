@@ -8,6 +8,7 @@ import {
   actGetCurrentUrl,
   actGoBack,
   actGoToPage,
+  actIsPageClosed,
   actMoveCursorAndScrollRandomly,
   actMoveCursorToSelectorAndClick,
   actMoveCursorToSelectorAndType,
@@ -24,12 +25,17 @@ import { workflowUpdates } from './workflow-updates';
 import { IEvaluateActivityInput } from '../activities/interfaces/evaluate-activity-input.interface';
 import { ISelector } from '../activities/interfaces/common/selector.interface';
 
-export async function pageManipulationWorkflow({ accountToken }: { accountToken: string }) {
+export async function pageManipulationWorkflow({
+  accountToken,
+}: {
+  accountToken: string;
+}): Promise<void> {
   const handlers = {
     clickOnSelectorAndOpenNewPage: (input: ISelector) =>
       actGetCurrentUrl(createActivityInput(accountToken, input)),
     closePage: (input: object) => actClosePage(createActivityInput(accountToken, input)),
     getCurrentUrl: (input: object) => actGetCurrentUrl(createActivityInput(accountToken, input)),
+    isPageClosed: (input: object) => actIsPageClosed(createActivityInput(accountToken, input)),
     reloadPage: (input: object) => actReloadPage(createActivityInput(accountToken, input)),
     evaluate: (input: IEvaluateActivityInput) =>
       actEvaluate(createActivityInput(accountToken, input)),

@@ -19,7 +19,7 @@ export const workflowUpdates = {
   goToPage: defineUpdate<void, [{ page: string }]>('goToPage'),
   moveCursorAndScrollRandomly: defineUpdate<void, [object]>('moveCursorAndScrollRandomly'),
   moveCursorToSelectorAndClick: defineUpdate<void, [ISelector]>('moveCursorToSelectorAndClick'),
-  moveCursorToSelectorAndType: defineUpdate<void, [{ text: string }]>(
+  moveCursorToSelectorAndType: defineUpdate<void, [{ text: string } & ISelector]>(
     'moveCursorToSelectorAndType',
   ),
   scrollBy: defineUpdate<number, [object]>('scrollBy'),

@@ -16,7 +16,8 @@ import { activitiesBundle } from '@app_modules/linkedin_automator_module/tempora
         const grpcEndpoint = configService.getOrThrow<string>('temporalConfig.grpcEndpoint');
         const apiKey = configService.getOrThrow<string>('temporalConfig.apiKey');
         const namespace = configService.getOrThrow<string>('temporalConfig.namespace');
-        const taskQueue = configService.getOrThrow<string>('temporalConfig.taskQueue');
+        // потом поменять
+        const taskQueue = 'runner-queue';
 
         Runtime.install({});
 
