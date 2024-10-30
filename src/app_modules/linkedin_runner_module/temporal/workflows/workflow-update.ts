@@ -4,7 +4,7 @@ import { IMultiEvaluateActivityInput } from '../activities/interfaces/multi-eval
 import { ISelector } from '../../interfaces/common/selector.interface';
 import { ITimeout } from '../../interfaces/common/timeout.interface';
 
-export const WORKFLOW_UPDATES = {
+export const WORKFLOW_UPDATE = {
   clickOnSelectorAndOpenNewPage: defineUpdate<string, [ISelector]>('clickOnSelectorAndOpenNewPage'),
   closePage: defineUpdate<void, [object]>('closePage'),
   getCurrentUrl: defineUpdate<string, [object]>('getCurrentUrl'),
