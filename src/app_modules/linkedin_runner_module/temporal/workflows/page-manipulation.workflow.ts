@@ -1,5 +1,6 @@
 import { setHandler } from '@temporalio/workflow';
 import {
+  actClickOnSelectorAndOpenNewPage,
   actClosePage,
   actEvaluate,
   actExtractLinksFromSelector,
@@ -32,7 +33,7 @@ export async function pageManipulationWorkflow({
 }): Promise<void> {
   const handlers = {
     clickOnSelectorAndOpenNewPage: (input: ISelector) =>
-      actGetCurrentUrl(createActivityInput(accountToken, input)),
+      actClickOnSelectorAndOpenNewPage(createActivityInput(accountToken, input)),
     closePage: (input: object) => actClosePage(createActivityInput(accountToken, input)),
     getCurrentUrl: (input: object) => actGetCurrentUrl(createActivityInput(accountToken, input)),
     isPageClosed: (input: object) => actIsPageClosed(createActivityInput(accountToken, input)),

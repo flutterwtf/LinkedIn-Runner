@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
+import { ValidationPipeOptions } from '@common/configs/validation-pipe.config';
+import { winstonConfig } from '@common/configs/winston.config';
+import { killProcessOnPort } from '@common/utils/kill-process-on-port';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
-import { killProcessOnPort } from '@common/utils/kill-process-on-port';
-import { winstonConfig } from '@common/configs/winston.config';
-import { ValidationPipeOptions } from '@common/configs/validation-pipe.config';
-import { AppExceptionFilter } from './common/filters/app-exception.filter';
+
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -16,7 +16,6 @@ async function bootstrap() {
   const logger: Logger = app.get(Logger);
 
   app.useGlobalPipes(new ValidationPipe(ValidationPipeOptions));
-  app.useGlobalFilters(new AppExceptionFilter(logger));
 
   await killProcessOnPort(PORT, logger);
   await app.listen(PORT, () => {
