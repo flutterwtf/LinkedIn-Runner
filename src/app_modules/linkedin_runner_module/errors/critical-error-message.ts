@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unused-modules */
 export const CRITICAL_ERROR_MESSAGE = [
   /connection closed/i,
   /target closed/i,

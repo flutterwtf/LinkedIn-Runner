@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable import/no-unused-modules */
 import { ValidationPipeOptions } from '@common/configs/validation-pipe.config';
 import { winstonConfig } from '@common/configs/winston.config';
 import { killProcessOnPort } from '@common/utils/kill-process-on-port';
