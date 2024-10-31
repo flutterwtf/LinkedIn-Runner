@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  linkedin-runner:
+    container_name: linkedin-runner-dev
+    image: rgs.flutter.wtf/linkedin-runner:dev
+    shm_size: '2gb'
+    restart: unless-stopped
+    labels:
+      - 'com.centurylinklabs.watchtower.enable=true'
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    environment:
+      - LINKEDIN_LOGIC_API_TOKEN=$LINKEDIN_LOGIC_API_TOKEN
+      - LINKEDIN_LOGIC_HOST_URL=$LINKEDIN_LOGIC_HOST_URL
+      - ACCOUNT_TYPE=$ACCOUNT_TYPE
+      - IPROYAL_API_KEY=$IPROYAL_API_KEY
+      - TEMPORAL_GRPC_ENDPOINT=$TEMPORAL_GRPC_ENDPOINT
+      - TEMPORAL_API_KEY=$TEMPORAL_API_KEY
+      - TEMPORAL_NAMESPACE=$TEMPORAL_NAMESPACE
+      - TEMPORAL_TASK_QUEUE=$TEMPORAL_TASK_QUEUE
+    ports:
+      - 5900:5900
+    volumes:
+      - browser_data:/home/ubuntu/.config/google-chrome
+    user: root 
+
+volumes:
+  browser_data:
+  
