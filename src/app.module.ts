@@ -5,6 +5,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { LinkedInRunnerModule } from '@app_modules/linkedin_runner_module/linkedin-runner.module';
 
 @Module({
-  imports: [LoggerModule, ConfigModule.forRoot(), LinkedInRunnerModule, ScheduleModule.forRoot()],
+  imports: [ConfigModule.forRoot(), ScheduleModule.forRoot(), LoggerModule, LinkedInRunnerModule],
 })
 export class AppModule {}

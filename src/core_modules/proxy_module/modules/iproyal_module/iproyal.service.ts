@@ -16,7 +16,7 @@ export class IpRoyalService implements ProxyService {
   private readonly axios: AxiosInstance;
 
   constructor(private readonly configService: ConfigService) {
-    const hostUrl = this.configService.getOrThrow<string>('ipRoyalConfig.hostUrl');
+    const hostUrl = 'https://apid.iproyal.com';
     const apiToken = this.configService.getOrThrow<string>('ipRoyalConfig.apiToken');
 
     this.axios = axios.create({

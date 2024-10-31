@@ -39,9 +39,9 @@ export async function pageManipulationWorkflow({
     getCurrentUrl: (input: object) => actGetCurrentUrl(createActivityInput(accountToken, input)),
     isPageClosed: (input: object) => actIsPageClosed(createActivityInput(accountToken, input)),
     reloadPage: (input: object) => actReloadPage(createActivityInput(accountToken, input)),
-    evaluate: (input: IEvaluateActivityInput) =>
+    evaluate: (input: IEvaluateActivityInput<unknown>) =>
       actEvaluate(createActivityInput(accountToken, input)),
-    multiEvaluate: (input: IMultiEvaluateActivityInput) =>
+    multiEvaluate: (input: IMultiEvaluateActivityInput<unknown>) =>
       actMultiEvaluate(createActivityInput(accountToken, input)),
     extractLinksFromSelector: (input: ISelector) =>
       actExtractLinksFromSelector(createActivityInput(accountToken, input)),

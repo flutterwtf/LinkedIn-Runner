@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { generateRandomValue } from '@common/utils/generate-random-value';
 import { GhostCursor, createCursor } from 'ghost-cursor';
-import { ElementHandle, Page } from 'puppeteer-core';
+import { Browser, ElementHandle, Page } from 'puppeteer-core';
 import { CursorUtil } from './utils/cursor-util';
 import { BrowserConnectionService } from './browser-connection.service';
+import { VIEW_PORT } from './constants/view-port';
 
 @Injectable()
 export class PageManipulationService {
@@ -26,29 +27,50 @@ export class PageManipulationService {
     selector: string;
   }): Promise<Page> {
     const browser = this.browserConnectionService.getBrowserByPage(browserPage)!;
-    let newPage: Page | null = null;
 
+    const newPage = await this.createNewPage({
+      browser,
+      cursor,
+      selector,
+    });
+    await this.setupNewPage(newPage);
+
+    return newPage;
+  }
+
+  private async createNewPage({
+    browser,
+    cursor,
+    selector,
+  }: {
+    browser: Browser;
+    cursor: GhostCursor;
+    selector: string;
+  }): Promise<Page> {
+    const [newPage] = await Promise.all([
+      new Promise<Page>((resolve) => {
+        browser.once('targetcreated', async (target) => resolve((await target.page())!));
+      }),
+      this.moveCursorToSelectorAndClick(cursor, selector),
+    ]);
+
+    if (!newPage) {
+      throw new Error('New page was not created');
+    }
+
+    return newPage;
+  }
+
+  private async setupNewPage(newPage: Page): Promise<void> {
     try {
-      [newPage] = await Promise.all([
-        new Promise<Page>((resolve) => {
-          browser.once('targetcreated', async (target) => resolve((await target.page())!));
-        }),
-        this.moveCursorToSelectorAndClick(cursor, selector),
-      ]);
-
-      if (!newPage) {
-        throw new Error('New page was not created');
-      }
-
+      const { width, height, deviceScaleFactor } = VIEW_PORT;
       await newPage.setViewport({
-        width: 1920,
-        height: 1080,
-        deviceScaleFactor: 1,
+        width,
+        height,
+        deviceScaleFactor,
       });
       await this.cursorUtil.installMouseHelper(newPage);
       await this.reload(newPage);
-
-      return newPage;
     } catch (err) {
       if (newPage) {
         await newPage.close();
@@ -241,10 +263,11 @@ export class PageManipulationService {
   }
 
   public async moveCursorAndScrollRandomly(browserPage: Page, cursor: GhostCursor): Promise<void> {
+    const { width, height } = VIEW_PORT;
     await cursor.moveTo(
       {
-        x: generateRandomValue(1080),
-        y: generateRandomValue(1920),
+        x: generateRandomValue(height),
+        y: generateRandomValue(width),
       },
       { randomizeMoveDelay: true },
     );

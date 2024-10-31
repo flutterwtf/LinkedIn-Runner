@@ -3,6 +3,7 @@ FROM ubuntu:20.04
 ENV XRES=1280x800x24
 ENV TZ=Etc/UTC
 ENV DEBIAN_FRONTEND=noninteractive
+ENV DISPLAY=:1
 
 # Install dependencies
 RUN apt-get update -q \
@@ -37,10 +38,10 @@ RUN useradd -m ubuntu -s /bin/bash \
   && echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Set up configuration files
-ADD etc /etc
-ADD config/xfce4/terminal/terminalrc /home/ubuntu/.config/xfce4/terminal/terminalrc
-ADD config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml /home/ubuntu/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
-ADD config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml /home/ubuntu/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
+ADD docker/etc /etc
+ADD docker/config/xfce4/terminal/terminalrc /home/ubuntu/.config/xfce4/terminal/terminalrc
+ADD docker/config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml /home/ubuntu/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
+ADD docker/config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml /home/ubuntu/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
 
 # Set up bashrc
 RUN echo 'export TZ=/usr/share/zoneinfo/$TZ' >> /home/ubuntu/.bashrc \

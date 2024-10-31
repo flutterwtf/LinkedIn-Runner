@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import puppeteer, { Browser, Page } from 'puppeteer-core';
 import { CursorUtil } from './utils/cursor-util';
+import { VIEW_PORT } from './constants/view-port';
 
 @Injectable()
 export class BrowserConnectionService {
@@ -78,10 +79,12 @@ export class BrowserConnectionService {
   private async createPageAndSetToMap(browser: Browser): Promise<Page> {
     const page = await browser.newPage();
     this.browserMap.set(page, browser);
+
+    const { width, height, deviceScaleFactor } = VIEW_PORT;
     await page.setViewport({
-      width: 1920,
-      height: 1080,
-      deviceScaleFactor: 1,
+      width,
+      height,
+      deviceScaleFactor,
     });
     await this.cursorUtil.installMouseHelper(page);
 

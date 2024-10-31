@@ -1,4 +1,4 @@
-export interface IEvaluateActivityInput {
-  pageFunction: (selector: string | Element, ...args: Array<unknown>) => unknown;
+export interface IEvaluateActivityInput<T> {
+  pageFunction: (selector: string | Element, ...args: Array<unknown>) => T;
   selector: string;
 }

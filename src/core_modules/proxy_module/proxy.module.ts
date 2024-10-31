@@ -5,7 +5,7 @@ import { IpRoyalService } from './modules/iproyal_module/iproyal.service';
 import { ProxyService } from './proxy.abstract.service';
 
 @Module({
-  imports: [IpRoyalModule, ConfigModule.forRoot()],
+  imports: [ConfigModule.forRoot(), IpRoyalModule],
   providers: [
     {
       provide: ProxyService,

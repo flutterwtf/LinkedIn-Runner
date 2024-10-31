@@ -1,4 +1,4 @@
-export interface IMultiEvaluateActivityInput {
-  pageFunction: (elements: Array<Element>) => unknown;
+export interface IMultiEvaluateActivityInput<T> {
+  pageFunction: (elements: Array<Element>) => T;
   selector: string;
 }
