@@ -34,6 +34,8 @@ export async function pageManipulationWorkflow({
   const handlers = {
     clickOnSelectorAndOpenNewPage: (input: ISelector) =>
       actClickOnSelectorAndOpenNewPage(createActivityInput(browserProfile, input)),
+    actCloseAdditionalPage: (input: object) =>
+      actCloseAdditionalPage(createActivityInput(browserProfile, input)),
     getCurrentUrl: (input: object) => actGetCurrentUrl(createActivityInput(browserProfile, input)),
     reloadPage: (input: object) => actReloadPage(createActivityInput(browserProfile, input)),
     evaluate: (input: IEvaluateActivityInput<unknown>) =>
