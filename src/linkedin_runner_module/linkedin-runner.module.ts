@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 import { PuppeteerModule } from '@core_modules/puppeteer_module/puppeteer.module';
 import { ProxyModule } from '@core_modules/proxy_module/proxy.module';
-import { BrowserService } from './services/browser.service';
-import { ConnectionService } from './services/schedulers/connection.service';
-import { TemporalConnectionModule } from './modules/temporal_connection_module/temporal-connection.module';
+import { BrowserService } from './logic/features/browser.service';
+import { TemporalWorkerModule } from './modules/temporal_worker_module/temporal-worker.module';
 import { activitiesBundle } from './temporal/activities/activities.bundle';
-import { LinkedInLogicModule } from './modules/linkedin_logic_module/linkedin-logic.module';
+import { AdditionalPageService } from './logic/features/additional-page.service';
 
 @Module({
-  imports: [TemporalConnectionModule, LinkedInLogicModule, PuppeteerModule, ProxyModule],
-  providers: [ConnectionService, BrowserService, ...activitiesBundle],
+  imports: [TemporalWorkerModule, PuppeteerModule, ProxyModule],
+  providers: [BrowserService, AdditionalPageService, ...activitiesBundle],
 })
 export class LinkedInRunnerModule {}

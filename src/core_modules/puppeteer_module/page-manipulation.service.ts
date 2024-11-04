@@ -18,15 +18,15 @@ export class PageManipulationService {
   ) {}
 
   public async clickOnSelectorAndOpenNewPage({
-    browserPage,
+    page,
     cursor,
     selector,
   }: {
-    browserPage: Page;
+    page: Page;
     cursor: GhostCursor;
     selector: string;
   }): Promise<Page> {
-    const browser = this.browserConnectionService.getBrowserByPage(browserPage)!;
+    const browser = this.browserConnectionService.getBrowserByPage(page)!;
 
     const newPage = await this.createNewPage({
       browser,
@@ -80,60 +80,60 @@ export class PageManipulationService {
     }
   }
 
-  public async reload(browserPage: Page): Promise<void> {
-    await browserPage.reload({ waitUntil: ['domcontentloaded', 'load'] });
+  public async reload(page: Page): Promise<void> {
+    await page.reload({ waitUntil: ['domcontentloaded', 'load'] });
   }
 
-  public async closePage(browserPage: Page): Promise<void> {
-    return browserPage.close();
+  public async closePage(page: Page): Promise<void> {
+    return page.close();
   }
 
-  public createCursor(browserPage: Page): GhostCursor {
-    return createCursor(browserPage, {
+  public createCursor(page: Page): GhostCursor {
+    return createCursor(page, {
       x: generateRandomValue(300),
       y: generateRandomValue(500),
     });
   }
 
-  public getCurrentUrl(browserPage: Page): string {
-    return browserPage.url();
+  public getCurrentUrl(page: Page): string {
+    return page.url();
   }
 
   public async evaluate<T>({
-    browserPage,
+    page,
     pageFunction,
     selector,
   }: {
-    browserPage: Page;
+    page: Page;
     pageFunction: (selector: string | Element, ...args: Array<unknown>) => T | Promise<T>;
     selector: string | ElementHandle<Element>;
   }): Promise<T> {
     if (typeof selector === 'string') {
-      await browserPage.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
+      await page.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
     }
 
-    return browserPage.evaluate(pageFunction, selector);
+    return page.evaluate(pageFunction, selector);
   }
 
   public async multiEvaluate<T>({
-    browserPage,
+    page,
     pageFunction,
     selector,
   }: {
-    browserPage: Page;
+    page: Page;
     pageFunction: (elements: Array<Element>) => T;
     selector: string;
   }): Promise<T> {
-    return browserPage.$$eval(selector, pageFunction);
+    return page.$$eval(selector, pageFunction);
   }
 
-  public async goToPage(browserPage: Page, page: string): Promise<void> {
+  public async goToPage(page: Page, url: string): Promise<void> {
     const maxRetries = 3;
     let retries = 0;
 
     while (retries < maxRetries) {
       try {
-        await browserPage.goto(page, {
+        await page.goto(url, {
           waitUntil: ['load', 'domcontentloaded'],
           timeout: this.navigationTimeout,
         });
@@ -147,7 +147,7 @@ export class PageManipulationService {
           retries += 1;
 
           if (retries < maxRetries) {
-            await this.reload(browserPage);
+            await this.reload(page);
           } else {
             throw error;
           }
@@ -158,29 +158,29 @@ export class PageManipulationService {
     }
   }
 
-  public async goBack(browserPage: Page): Promise<void> {
-    await browserPage.goBack({
+  public async goBack(page: Page): Promise<void> {
+    await page.goBack({
       waitUntil: ['load', 'domcontentloaded'],
       timeout: this.navigationTimeout,
     });
   }
 
   public async waitAndCheckIfSelectorExists({
-    browserPage,
+    page,
     selector,
     timeout = this.checkingExistenceTimeout,
   }: {
-    browserPage: Page;
+    page: Page;
     selector: string;
     timeout?: number;
   }): Promise<boolean> {
     try {
       await this.waitForSelector({
-        browserPage,
+        page,
         selector,
         timeout,
       });
-      const isExist = await this.checkIfSelectorExists(browserPage, selector);
+      const isExist = await this.checkIfSelectorExists(page, selector);
 
       return isExist;
     } catch {
@@ -189,22 +189,19 @@ export class PageManipulationService {
   }
 
   public async waitForSelector({
-    browserPage,
+    page,
     selector,
     timeout = this.waitingSelectorTimeout,
   }: {
-    browserPage: Page;
+    page: Page;
     selector: string;
     timeout?: number;
   }): Promise<void> {
-    await browserPage.waitForSelector(selector, { timeout });
+    await page.waitForSelector(selector, { timeout });
   }
 
-  public async extractTextsFromSelector(
-    browserPage: Page,
-    selector: string,
-  ): Promise<Array<string>> {
-    const elements = await browserPage.$$(selector);
+  public async extractTextsFromSelector(page: Page, selector: string): Promise<Array<string>> {
+    const elements = await page.$$(selector);
     const contents = await Promise.all(
       elements.map(async (element) => {
         const rawText = await element.evaluate((node) => node.textContent?.trim() || '');
@@ -219,11 +216,8 @@ export class PageManipulationService {
     return contents;
   }
 
-  public async extractLinksFromSelector(
-    browserPage: Page,
-    selector: string,
-  ): Promise<Array<string>> {
-    const elements = await browserPage.$$(selector);
+  public async extractLinksFromSelector(page: Page, selector: string): Promise<Array<string>> {
+    const elements = await page.$$(selector);
     const contents = await Promise.all(
       elements.map(async (element) => {
         const hrefProperty = await element.getProperty('href');
@@ -236,33 +230,33 @@ export class PageManipulationService {
     return contents;
   }
 
-  public async parseSelectorContent(browserPage: Page, selector: string): Promise<string> {
-    await browserPage.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
+  public async parseSelectorContent(page: Page, selector: string): Promise<string> {
+    await page.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
 
-    return browserPage.$eval(selector, (el) => (el as HTMLElement).innerText);
+    return page.$eval(selector, (el) => (el as HTMLElement).innerText);
   }
 
   public async moveCursorToSelectorAndType({
-    browserPage,
+    page,
     cursor,
     selector,
     text,
   }: {
-    browserPage: Page;
+    page: Page;
     cursor: GhostCursor;
     selector: string;
     text: string;
   }): Promise<void> {
     await this.moveCursorToSelectorAndClick(cursor, selector);
-    await this.clearInputElement(browserPage, selector);
+    await this.clearInputElement(page, selector);
     await this.typeInElement({
-      browserPage,
+      page,
       selector,
       text,
     });
   }
 
-  public async moveCursorAndScrollRandomly(browserPage: Page, cursor: GhostCursor): Promise<void> {
+  public async moveCursorAndScrollRandomly(page: Page, cursor: GhostCursor): Promise<void> {
     const { width, height } = VIEW_PORT;
     await cursor.moveTo(
       {
@@ -272,11 +266,11 @@ export class PageManipulationService {
       { randomizeMoveDelay: true },
     );
 
-    await this.scrollBy(browserPage);
+    await this.scrollBy(page);
   }
 
-  public async scrollBy(browserPage: Page): Promise<number> {
-    const scrollPosition = await browserPage.evaluate(() => {
+  public async scrollBy(page: Page): Promise<number> {
+    const scrollPosition = await page.evaluate(() => {
       window.scrollBy({
         top: window.innerHeight,
         behavior: 'smooth',
@@ -288,8 +282,8 @@ export class PageManipulationService {
     return scrollPosition;
   }
 
-  public async scrollToTop(browserPage: Page): Promise<void> {
-    await browserPage.evaluate(() => {
+  public async scrollToTop(page: Page): Promise<void> {
+    await page.evaluate(() => {
       window.scrollTo({
         top: 0,
       });
@@ -314,26 +308,26 @@ export class PageManipulationService {
   }
 
   private async typeInElement({
-    browserPage,
+    page,
     selector,
     text,
   }: {
-    browserPage: Page;
+    page: Page;
     selector: string;
     text: string;
   }): Promise<void> {
-    await browserPage.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
+    await page.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
 
     for (const char of text) {
-      await browserPage.type(selector, char, { delay: generateRandomValue(150) });
+      await page.type(selector, char, { delay: generateRandomValue(150) });
     }
   }
 
-  private async clearInputElement(browserPage: Page, selector: string): Promise<void> {
-    await browserPage.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
+  private async clearInputElement(page: Page, selector: string): Promise<void> {
+    await page.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
 
-    const inputElement = (await browserPage.$(selector)) as ElementHandle<HTMLInputElement>;
-    const inputValue: string = await browserPage.evaluate((el) => el.value, inputElement);
+    const inputElement = (await page.$(selector)) as ElementHandle<HTMLInputElement>;
+    const inputValue: string = await page.evaluate((el) => el.value, inputElement);
 
     if (inputValue.trim() !== '') {
       await inputElement.click({ clickCount: 3 });
@@ -341,8 +335,8 @@ export class PageManipulationService {
     }
   }
 
-  private async checkIfSelectorExists(browserPage: Page, selector: string): Promise<boolean> {
-    const element = await browserPage.$(selector);
+  private async checkIfSelectorExists(page: Page, selector: string): Promise<boolean> {
+    const element = await page.$(selector);
 
     return element !== null;
   }

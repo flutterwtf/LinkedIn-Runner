@@ -32,8 +32,8 @@
     "typeRoots": ["./node_modules/@types", "./types"],
     "paths": {
       "@core_modules/*": ["./src/core_modules/*"],
-      "@app_modules/*": ["./src/app_modules/*"],
       "@common/*": ["./src/common/*"],
+      "@linkedin_runner_module/*": ["./src/linkedin_runner_module/*"],
     }
   },
   "exclude": ["node_modules", "**/node_modules/*", "./build", "**/dist/*"],
