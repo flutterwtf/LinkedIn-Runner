@@ -38,48 +38,6 @@ export class PageManipulationService {
     return newPage;
   }
 
-  private async createNewPage({
-    browser,
-    cursor,
-    selector,
-  }: {
-    browser: Browser;
-    cursor: GhostCursor;
-    selector: string;
-  }): Promise<Page> {
-    const [newPage] = await Promise.all([
-      new Promise<Page>((resolve) => {
-        browser.once('targetcreated', async (target) => resolve((await target.page())!));
-      }),
-      this.moveCursorToSelectorAndClick(cursor, selector),
-    ]);
-
-    if (!newPage) {
-      throw new Error('New page was not created');
-    }
-
-    return newPage;
-  }
-
-  private async setupNewPage(newPage: Page): Promise<void> {
-    try {
-      const { width, height, deviceScaleFactor } = VIEW_PORT;
-      await newPage.setViewport({
-        width,
-        height,
-        deviceScaleFactor,
-      });
-      await this.cursorUtil.installMouseHelper(newPage);
-      await this.reload(newPage);
-    } catch (err) {
-      if (newPage) {
-        await newPage.close();
-      }
-
-      throw err;
-    }
-  }
-
   public async reload(page: Page): Promise<void> {
     await page.reload({ waitUntil: ['domcontentloaded', 'load'] });
   }
@@ -97,34 +55,6 @@ export class PageManipulationService {
 
   public getCurrentUrl(page: Page): string {
     return page.url();
-  }
-
-  public async evaluate<T>({
-    page,
-    pageFunction,
-    selector,
-  }: {
-    page: Page;
-    pageFunction: (selector: string | Element, ...args: Array<unknown>) => T | Promise<T>;
-    selector: string | ElementHandle<Element>;
-  }): Promise<T> {
-    if (typeof selector === 'string') {
-      await page.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
-    }
-
-    return page.evaluate(pageFunction, selector);
-  }
-
-  public async multiEvaluate<T>({
-    page,
-    pageFunction,
-    selector,
-  }: {
-    page: Page;
-    pageFunction: (elements: Array<Element>) => T;
-    selector: string;
-  }): Promise<T> {
-    return page.$$eval(selector, pageFunction);
   }
 
   public async goToPage(page: Page, url: string): Promise<void> {
@@ -290,6 +220,27 @@ export class PageManipulationService {
     });
   }
 
+  public async scrollToBottom(page: Page): Promise<void> {
+    await page.evaluate(async () => {
+      const scrollCount = 3;
+      const scrollDelay = 500;
+      const scrollVariance = 300;
+
+      for (let i = 0; i < scrollCount; i += 1) {
+        window.scrollBy({
+          top: Math.round(
+            (Math.random() * document.body.scrollHeight) / 10 +
+              document.body.scrollHeight / scrollCount,
+          ),
+          behavior: 'smooth',
+        });
+        await new Promise((resolve) => {
+          setTimeout(resolve, scrollDelay + Math.random() * scrollVariance);
+        });
+      }
+    });
+  }
+
   public async moveCursorToSelectorAndClick(
     cursor: GhostCursor,
     selector: string | ElementHandle,
@@ -305,6 +256,48 @@ export class PageManipulationService {
       paddingPercentage: 99,
       waitForSelector: this.waitingSelectorTimeout,
     });
+  }
+
+  private async createNewPage({
+    browser,
+    cursor,
+    selector,
+  }: {
+    browser: Browser;
+    cursor: GhostCursor;
+    selector: string;
+  }): Promise<Page> {
+    const [newPage] = await Promise.all([
+      new Promise<Page>((resolve) => {
+        browser.once('targetcreated', async (target) => resolve((await target.page())!));
+      }),
+      this.moveCursorToSelectorAndClick(cursor, selector),
+    ]);
+
+    if (!newPage) {
+      throw new Error('New page was not created');
+    }
+
+    return newPage;
+  }
+
+  private async setupNewPage(newPage: Page): Promise<void> {
+    try {
+      const { width, height, deviceScaleFactor } = VIEW_PORT;
+      await newPage.setViewport({
+        width,
+        height,
+        deviceScaleFactor,
+      });
+      await this.cursorUtil.installMouseHelper(newPage);
+      await this.reload(newPage);
+    } catch (err) {
+      if (newPage) {
+        await newPage.close();
+      }
+
+      throw err;
+    }
   }
 
   private async typeInElement({

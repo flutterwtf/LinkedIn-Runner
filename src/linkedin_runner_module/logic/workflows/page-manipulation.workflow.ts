@@ -1,13 +1,10 @@
 /* eslint-disable import/no-unused-modules */
 import { setHandler } from '@temporalio/workflow';
 import { createActivityInput } from '@linkedin_runner_module/temporal/activities/utils/create-activity-input';
-import { IMultiEvaluateActivityInput } from '@linkedin_runner_module/interfaces/activities/multi-evaluate-activity-input.interface';
-import { IEvaluateActivityInput } from '@linkedin_runner_module/interfaces/activities/evaluate-activity-input.interface';
 import { WORKFLOW_UPDATE } from '@linkedin_runner_module/temporal/updates/workflow-update';
 import { ISelector } from '@linkedin_runner_module/interfaces/common/selector.interface';
 import {
   actClickOnSelectorAndOpenNewPage,
-  actEvaluate,
   actExtractLinksFromSelector,
   actExtractSelectorContent,
   actExtractTextsFromSelector,
@@ -17,9 +14,9 @@ import {
   actMoveCursorAndScrollRandomly,
   actMoveCursorToSelectorAndClick,
   actMoveCursorToSelectorAndType,
-  actMultiEvaluate,
   actReloadPage,
-  actScrollBy,
+  actScroll,
+  actScrollToBottom,
   actScrollToTop,
   actWaitAndCheckIfSelectorExists,
   actWaitForSelector,
@@ -34,14 +31,10 @@ export async function pageManipulationWorkflow({
   const handlers = {
     clickOnSelectorAndOpenNewPage: (input: ISelector) =>
       actClickOnSelectorAndOpenNewPage(createActivityInput(browserProfile, input)),
-    actCloseAdditionalPage: (input: object) =>
+    closeAdditionalPage: (input: object) =>
       actCloseAdditionalPage(createActivityInput(browserProfile, input)),
     getCurrentUrl: (input: object) => actGetCurrentUrl(createActivityInput(browserProfile, input)),
     reloadPage: (input: object) => actReloadPage(createActivityInput(browserProfile, input)),
-    evaluate: (input: IEvaluateActivityInput<unknown>) =>
-      actEvaluate(createActivityInput(browserProfile, input)),
-    multiEvaluate: (input: IMultiEvaluateActivityInput<unknown>) =>
-      actMultiEvaluate(createActivityInput(browserProfile, input)),
     extractLinksFromSelector: (input: ISelector) =>
       actExtractLinksFromSelector(createActivityInput(browserProfile, input)),
     extractSelectorContent: (input: ISelector) =>
@@ -56,7 +49,9 @@ export async function pageManipulationWorkflow({
       actMoveCursorToSelectorAndClick(createActivityInput(browserProfile, input)),
     moveCursorToSelectorAndType: (input: { text: string } & ISelector) =>
       actMoveCursorToSelectorAndType(createActivityInput(browserProfile, input)),
-    scrollBy: (input: object) => actScrollBy(createActivityInput(browserProfile, input)),
+    scroll: (input: object) => actScroll(createActivityInput(browserProfile, input)),
+    scrollToBottom: (input: object) =>
+      actScrollToBottom(createActivityInput(browserProfile, input)),
     scrollToTop: (input: object) => actScrollToTop(createActivityInput(browserProfile, input)),
     waitAndCheckIfSelectorExists: (input: { timeout: number } & ISelector) =>
       actWaitAndCheckIfSelectorExists(createActivityInput(browserProfile, input)),
@@ -65,9 +60,10 @@ export async function pageManipulationWorkflow({
   };
 
   Object.entries(WORKFLOW_UPDATE).forEach(([key, update]) => {
-    setHandler(update, async (input: unknown) =>
-      handlers[key as keyof typeof handlers](input as never),
-    );
+    setHandler(update, async (input: unknown) => {
+      const result = await handlers[key as keyof typeof handlers](input as never);
+      return result as string;
+    });
   });
 
   await new Promise(() => {});
