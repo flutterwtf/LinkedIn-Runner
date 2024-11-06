@@ -18,15 +18,15 @@ export class PageManipulationService {
   ) {}
 
   public async clickOnSelectorAndOpenNewPage({
-    browserPage,
+    page,
     cursor,
     selector,
   }: {
-    browserPage: Page;
+    page: Page;
     cursor: GhostCursor;
     selector: string;
   }): Promise<Page> {
-    const browser = this.browserConnectionService.getBrowserByPage(browserPage)!;
+    const browser = this.browserConnectionService.getBrowserByPage(page)!;
 
     const newPage = await this.createNewPage({
       browser,
@@ -36,6 +36,226 @@ export class PageManipulationService {
     await this.setupNewPage(newPage);
 
     return newPage;
+  }
+
+  public async reload(page: Page): Promise<void> {
+    await page.reload({ waitUntil: ['domcontentloaded', 'load'] });
+  }
+
+  public async closePage(page: Page): Promise<void> {
+    return page.close();
+  }
+
+  public createCursor(page: Page): GhostCursor {
+    return createCursor(page, {
+      x: generateRandomValue(300),
+      y: generateRandomValue(500),
+    });
+  }
+
+  public getCurrentUrl(page: Page): string {
+    return page.url();
+  }
+
+  public async goToPage(page: Page, url: string): Promise<void> {
+    const maxRetries = 3;
+    let retries = 0;
+
+    while (retries < maxRetries) {
+      try {
+        await page.goto(url, {
+          waitUntil: ['load', 'domcontentloaded'],
+          timeout: this.navigationTimeout,
+        });
+        return;
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message.includes('net::ERR_TOO_MANY_RETRIES') &&
+          error.message.includes('net::ERR_INSUFFICIENT_RESOURCES')
+        ) {
+          retries += 1;
+
+          if (retries < maxRetries) {
+            await this.reload(page);
+          } else {
+            throw error;
+          }
+        } else {
+          throw error;
+        }
+      }
+    }
+  }
+
+  public async goBack(page: Page): Promise<void> {
+    await page.goBack({
+      waitUntil: ['load', 'domcontentloaded'],
+      timeout: this.navigationTimeout,
+    });
+  }
+
+  public async waitAndCheckIfSelectorExists({
+    page,
+    selector,
+    timeout = this.checkingExistenceTimeout,
+  }: {
+    page: Page;
+    selector: string;
+    timeout?: number;
+  }): Promise<boolean> {
+    try {
+      await this.waitForSelector({
+        page,
+        selector,
+        timeout,
+      });
+      const isExist = await this.checkIfSelectorExists(page, selector);
+
+      return isExist;
+    } catch {
+      return false;
+    }
+  }
+
+  public async waitForSelector({
+    page,
+    selector,
+    timeout = this.waitingSelectorTimeout,
+  }: {
+    page: Page;
+    selector: string;
+    timeout?: number;
+  }): Promise<void> {
+    await page.waitForSelector(selector, { timeout });
+  }
+
+  public async extractTextsFromSelector(page: Page, selector: string): Promise<Array<string>> {
+    const elements = await page.$$(selector);
+    const contents = await Promise.all(
+      elements.map(async (element) => {
+        const rawText = await element.evaluate((node) => node.textContent?.trim() || '');
+        const text = rawText.trim();
+        const innerTextElem = await element.$('span');
+        const innerText = (await innerTextElem?.evaluate((node) => node.textContent?.trim())) || '';
+
+        return innerTextElem ? innerText : text;
+      }),
+    );
+
+    return contents;
+  }
+
+  public async extractLinksFromSelector(page: Page, selector: string): Promise<Array<string>> {
+    const elements = await page.$$(selector);
+    const contents = await Promise.all(
+      elements.map(async (element) => {
+        const hrefProperty = await element.getProperty('href');
+        const href = (await hrefProperty.jsonValue()) as string;
+
+        return href;
+      }),
+    );
+
+    return contents;
+  }
+
+  public async parseSelectorContent(page: Page, selector: string): Promise<string> {
+    await page.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
+
+    return page.$eval(selector, (el) => (el as HTMLElement).innerText);
+  }
+
+  public async moveCursorToSelectorAndType({
+    page,
+    cursor,
+    selector,
+    text,
+  }: {
+    page: Page;
+    cursor: GhostCursor;
+    selector: string;
+    text: string;
+  }): Promise<void> {
+    await this.moveCursorToSelectorAndClick(cursor, selector);
+    await this.clearInputElement(page, selector);
+    await this.typeInElement({
+      page,
+      selector,
+      text,
+    });
+  }
+
+  public async moveCursorAndScrollRandomly(page: Page, cursor: GhostCursor): Promise<void> {
+    const { width, height } = VIEW_PORT;
+    await cursor.moveTo(
+      {
+        x: generateRandomValue(height),
+        y: generateRandomValue(width),
+      },
+      { randomizeMoveDelay: true },
+    );
+
+    await this.scrollBy(page);
+  }
+
+  public async scrollBy(page: Page): Promise<number> {
+    const scrollPosition = await page.evaluate(() => {
+      window.scrollBy({
+        top: window.innerHeight,
+        behavior: 'smooth',
+      });
+
+      return window.scrollY;
+    });
+
+    return scrollPosition;
+  }
+
+  public async scrollToTop(page: Page): Promise<void> {
+    await page.evaluate(() => {
+      window.scrollTo({
+        top: 0,
+      });
+    });
+  }
+
+  public async scrollToBottom(page: Page): Promise<void> {
+    await page.evaluate(async () => {
+      const scrollCount = 3;
+      const scrollDelay = 500;
+      const scrollVariance = 300;
+
+      for (let i = 0; i < scrollCount; i += 1) {
+        window.scrollBy({
+          top: Math.round(
+            (Math.random() * document.body.scrollHeight) / 10 +
+              document.body.scrollHeight / scrollCount,
+          ),
+          behavior: 'smooth',
+        });
+        await new Promise((resolve) => {
+          setTimeout(resolve, scrollDelay + Math.random() * scrollVariance);
+        });
+      }
+    });
+  }
+
+  public async moveCursorToSelectorAndClick(
+    cursor: GhostCursor,
+    selector: string | ElementHandle,
+  ): Promise<void> {
+    await cursor.move(selector, {
+      randomizeMoveDelay: true,
+      paddingPercentage: 99,
+      waitForSelector: this.waitingSelectorTimeout,
+    });
+    await cursor.click(selector, {
+      waitForClick: generateRandomValue(100),
+      hesitate: generateRandomValue(100),
+      paddingPercentage: 99,
+      waitForSelector: this.waitingSelectorTimeout,
+    });
   }
 
   private async createNewPage({
@@ -80,260 +300,27 @@ export class PageManipulationService {
     }
   }
 
-  public async reload(browserPage: Page): Promise<void> {
-    await browserPage.reload({ waitUntil: ['domcontentloaded', 'load'] });
-  }
-
-  public async closePage(browserPage: Page): Promise<void> {
-    return browserPage.close();
-  }
-
-  public createCursor(browserPage: Page): GhostCursor {
-    return createCursor(browserPage, {
-      x: generateRandomValue(300),
-      y: generateRandomValue(500),
-    });
-  }
-
-  public getCurrentUrl(browserPage: Page): string {
-    return browserPage.url();
-  }
-
-  public async evaluate<T>({
-    browserPage,
-    pageFunction,
-    selector,
-  }: {
-    browserPage: Page;
-    pageFunction: (selector: string | Element, ...args: Array<unknown>) => T | Promise<T>;
-    selector: string | ElementHandle<Element>;
-  }): Promise<T> {
-    if (typeof selector === 'string') {
-      await browserPage.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
-    }
-
-    return browserPage.evaluate(pageFunction, selector);
-  }
-
-  public async multiEvaluate<T>({
-    browserPage,
-    pageFunction,
-    selector,
-  }: {
-    browserPage: Page;
-    pageFunction: (elements: Array<Element>) => T;
-    selector: string;
-  }): Promise<T> {
-    return browserPage.$$eval(selector, pageFunction);
-  }
-
-  public async goToPage(browserPage: Page, page: string): Promise<void> {
-    const maxRetries = 3;
-    let retries = 0;
-
-    while (retries < maxRetries) {
-      try {
-        await browserPage.goto(page, {
-          waitUntil: ['load', 'domcontentloaded'],
-          timeout: this.navigationTimeout,
-        });
-        return;
-      } catch (error) {
-        if (
-          error instanceof Error &&
-          error.message.includes('net::ERR_TOO_MANY_RETRIES') &&
-          error.message.includes('net::ERR_INSUFFICIENT_RESOURCES')
-        ) {
-          retries += 1;
-
-          if (retries < maxRetries) {
-            await this.reload(browserPage);
-          } else {
-            throw error;
-          }
-        } else {
-          throw error;
-        }
-      }
-    }
-  }
-
-  public async goBack(browserPage: Page): Promise<void> {
-    await browserPage.goBack({
-      waitUntil: ['load', 'domcontentloaded'],
-      timeout: this.navigationTimeout,
-    });
-  }
-
-  public async waitAndCheckIfSelectorExists({
-    browserPage,
-    selector,
-    timeout = this.checkingExistenceTimeout,
-  }: {
-    browserPage: Page;
-    selector: string;
-    timeout?: number;
-  }): Promise<boolean> {
-    try {
-      await this.waitForSelector({
-        browserPage,
-        selector,
-        timeout,
-      });
-      const isExist = await this.checkIfSelectorExists(browserPage, selector);
-
-      return isExist;
-    } catch {
-      return false;
-    }
-  }
-
-  public async waitForSelector({
-    browserPage,
-    selector,
-    timeout = this.waitingSelectorTimeout,
-  }: {
-    browserPage: Page;
-    selector: string;
-    timeout?: number;
-  }): Promise<void> {
-    await browserPage.waitForSelector(selector, { timeout });
-  }
-
-  public async extractTextsFromSelector(
-    browserPage: Page,
-    selector: string,
-  ): Promise<Array<string>> {
-    const elements = await browserPage.$$(selector);
-    const contents = await Promise.all(
-      elements.map(async (element) => {
-        const rawText = await element.evaluate((node) => node.textContent?.trim() || '');
-        const text = rawText.trim();
-        const innerTextElem = await element.$('span');
-        const innerText = (await innerTextElem?.evaluate((node) => node.textContent?.trim())) || '';
-
-        return innerTextElem ? innerText : text;
-      }),
-    );
-
-    return contents;
-  }
-
-  public async extractLinksFromSelector(
-    browserPage: Page,
-    selector: string,
-  ): Promise<Array<string>> {
-    const elements = await browserPage.$$(selector);
-    const contents = await Promise.all(
-      elements.map(async (element) => {
-        const hrefProperty = await element.getProperty('href');
-        const href = (await hrefProperty.jsonValue()) as string;
-
-        return href;
-      }),
-    );
-
-    return contents;
-  }
-
-  public async parseSelectorContent(browserPage: Page, selector: string): Promise<string> {
-    await browserPage.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
-
-    return browserPage.$eval(selector, (el) => (el as HTMLElement).innerText);
-  }
-
-  public async moveCursorToSelectorAndType({
-    browserPage,
-    cursor,
-    selector,
-    text,
-  }: {
-    browserPage: Page;
-    cursor: GhostCursor;
-    selector: string;
-    text: string;
-  }): Promise<void> {
-    await this.moveCursorToSelectorAndClick(cursor, selector);
-    await this.clearInputElement(browserPage, selector);
-    await this.typeInElement({
-      browserPage,
-      selector,
-      text,
-    });
-  }
-
-  public async moveCursorAndScrollRandomly(browserPage: Page, cursor: GhostCursor): Promise<void> {
-    const { width, height } = VIEW_PORT;
-    await cursor.moveTo(
-      {
-        x: generateRandomValue(height),
-        y: generateRandomValue(width),
-      },
-      { randomizeMoveDelay: true },
-    );
-
-    await this.scrollBy(browserPage);
-  }
-
-  public async scrollBy(browserPage: Page): Promise<number> {
-    const scrollPosition = await browserPage.evaluate(() => {
-      window.scrollBy({
-        top: window.innerHeight,
-        behavior: 'smooth',
-      });
-
-      return window.scrollY;
-    });
-
-    return scrollPosition;
-  }
-
-  public async scrollToTop(browserPage: Page): Promise<void> {
-    await browserPage.evaluate(() => {
-      window.scrollTo({
-        top: 0,
-      });
-    });
-  }
-
-  public async moveCursorToSelectorAndClick(
-    cursor: GhostCursor,
-    selector: string | ElementHandle,
-  ): Promise<void> {
-    await cursor.move(selector, {
-      randomizeMoveDelay: true,
-      paddingPercentage: 99,
-      waitForSelector: this.waitingSelectorTimeout,
-    });
-    await cursor.click(selector, {
-      waitForClick: generateRandomValue(100),
-      hesitate: generateRandomValue(100),
-      paddingPercentage: 99,
-      waitForSelector: this.waitingSelectorTimeout,
-    });
-  }
-
   private async typeInElement({
-    browserPage,
+    page,
     selector,
     text,
   }: {
-    browserPage: Page;
+    page: Page;
     selector: string;
     text: string;
   }): Promise<void> {
-    await browserPage.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
+    await page.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
 
     for (const char of text) {
-      await browserPage.type(selector, char, { delay: generateRandomValue(150) });
+      await page.type(selector, char, { delay: generateRandomValue(150) });
     }
   }
 
-  private async clearInputElement(browserPage: Page, selector: string): Promise<void> {
-    await browserPage.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
+  private async clearInputElement(page: Page, selector: string): Promise<void> {
+    await page.waitForSelector(selector, { timeout: this.waitingSelectorTimeout });
 
-    const inputElement = (await browserPage.$(selector)) as ElementHandle<HTMLInputElement>;
-    const inputValue: string = await browserPage.evaluate((el) => el.value, inputElement);
+    const inputElement = (await page.$(selector)) as ElementHandle<HTMLInputElement>;
+    const inputValue: string = await page.evaluate((el) => el.value, inputElement);
 
     if (inputValue.trim() !== '') {
       await inputElement.click({ clickCount: 3 });
@@ -341,8 +328,8 @@ export class PageManipulationService {
     }
   }
 
-  private async checkIfSelectorExists(browserPage: Page, selector: string): Promise<boolean> {
-    const element = await browserPage.$(selector);
+  private async checkIfSelectorExists(page: Page, selector: string): Promise<boolean> {
+    const element = await page.$(selector);
 
     return element !== null;
   }

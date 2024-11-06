@@ -20,35 +20,6 @@ export class BrowserConnectionService {
     return this.browserMap.get(page);
   }
 
-  public deleteFromBrowserMap(page: Page): void {
-    this.browserMap.delete(page);
-  }
-
-  public async recreatePage(browserPage: Page): Promise<Page> {
-    const browser = this.browserMap.get(browserPage)!;
-    this.browserMap.delete(browserPage);
-    await browserPage.close();
-
-    return this.createPageAndSetToMap(browser);
-  }
-
-  public async closeBrowser(browserPage: Page): Promise<void> {
-    const browser = this.browserMap.get(browserPage)!;
-
-    await browserPage.close();
-    await browser.close();
-
-    this.browserMap.delete(browserPage);
-  }
-
-  public getBrowser(browserPage: Page): Browser {
-    const browser = this.browserMap.get(browserPage);
-    if (!browser) {
-      throw new Error('Browser not found for the given page');
-    }
-    return browser;
-  }
-
   private async launchBrowser(profileId: string): Promise<Browser> {
     const commonArgs = [
       '--no-sandbox',

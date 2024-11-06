@@ -3,8 +3,8 @@ import { Page } from 'puppeteer-core';
 
 @Injectable()
 export class CursorUtil {
-  public async installMouseHelper(browserPage: Page): Promise<void> {
-    await browserPage.evaluateOnNewDocument(() => {
+  public async installMouseHelper(page: Page): Promise<void> {
+    await page.evaluateOnNewDocument(() => {
       if (window !== window.parent) {
         return;
       }
