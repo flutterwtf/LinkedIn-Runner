@@ -4,7 +4,7 @@ import { IBrowserProfileActivityInput } from '@linkedin_runner_module/interfaces
 import { Activities, Activity } from 'nestjs-temporal';
 import { ISelector } from '@linkedin_runner_module/interfaces/common/selector.interface';
 import { ITimeout } from '@linkedin_runner_module/interfaces/common/timeout.interface';
-import { BrowserService } from '@linkedin_runner_module/logic/features/browser.service';
+import { PageService } from '../../../modules/page_module/services/page.service';
 
 @Injectable()
 @Activities()
@@ -12,16 +12,17 @@ export class WaitAndCheckIfSelectorExistsActivity {
   private readonly checkingExistenceTimeout = 5000;
 
   constructor(
-    private readonly browserService: BrowserService,
     private readonly pageManipulationService: PageManipulationService,
+    private readonly pageService: PageService,
   ) {}
 
   @Activity()
   public async actWaitAndCheckIfSelectorExists({
     browserProfile,
+    pageType,
     input: { selector, timeout = this.checkingExistenceTimeout },
   }: IBrowserProfileActivityInput<ISelector & ITimeout>): Promise<boolean> {
-    const { page } = await this.browserService.getPageAndCursor(browserProfile);
+    const { page } = await this.pageService.getPageAndCursor(browserProfile, pageType);
 
     return this.pageManipulationService.waitAndCheckIfSelectorExists({
       page,

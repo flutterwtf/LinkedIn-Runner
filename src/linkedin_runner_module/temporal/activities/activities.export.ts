@@ -9,7 +9,7 @@ import { MoveCursorToSelectorAndClickActivity } from '@linkedin_runner_module/lo
 import { MoveCursorToSelectorAndTypeActivity } from '@linkedin_runner_module/logic/activities/move/move-cursor-to-selector-and-type.activity.service';
 import { ScrollToTopActivity } from '@linkedin_runner_module/logic/activities/scroll/scroll-to-top.activity.service';
 import { WaitForSelectorActivity } from '@linkedin_runner_module/logic/activities/wait/wait-for-selector.activity.service';
-import { ClickOnSelectorAndOpenNewPageActivity } from '@linkedin_runner_module/logic/activities/common/click-on-selector-and-open-new-page.activity.service';
+import { ClickOnSelectorAndOpenAdditionalPageActivity } from '@linkedin_runner_module/logic/activities/common/click-on-selector-and-open-new-page.activity.service';
 import { GetCurrentUrlActivity } from '@linkedin_runner_module/logic/activities/common/get-current-url.activity.service';
 import { ReloadPageActivity } from '@linkedin_runner_module/logic/activities/common/reload-page.activity.service';
 import { ScrollActivity } from '@linkedin_runner_module/logic/activities/scroll/scroll.activity.service';
@@ -19,8 +19,8 @@ import { CloseAdditionalPageActivity } from '@linkedin_runner_module/logic/activ
 import { defaultActivityConfig } from './configs/default-activity.config';
 
 // Common
-export const { actClickOnSelectorAndOpenNewPage } =
-  proxyActivities<ClickOnSelectorAndOpenNewPageActivity>(defaultActivityConfig);
+export const { actClickOnSelectorAndOpenAdditionalPage } =
+  proxyActivities<ClickOnSelectorAndOpenAdditionalPageActivity>(defaultActivityConfig);
 export const { actCloseAdditionalPage } =
   proxyActivities<CloseAdditionalPageActivity>(defaultActivityConfig);
 export const { actGetCurrentUrl } = proxyActivities<GetCurrentUrlActivity>(defaultActivityConfig);

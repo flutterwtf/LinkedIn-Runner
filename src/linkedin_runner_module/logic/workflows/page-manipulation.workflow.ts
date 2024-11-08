@@ -1,10 +1,13 @@
 /* eslint-disable import/no-unused-modules */
-import { setHandler } from '@temporalio/workflow';
+import { ISelector } from '@linkedin_runner_module/interfaces/common/selector.interface';
+import { ITimeout } from '@linkedin_runner_module/interfaces/common/timeout.interface';
 import { createActivityInput } from '@linkedin_runner_module/temporal/activities/utils/create-activity-input';
 import { WORKFLOW_UPDATE } from '@linkedin_runner_module/temporal/updates/workflow-update';
-import { ISelector } from '@linkedin_runner_module/interfaces/common/selector.interface';
+import { IWorkflowUpdateInput } from '@linkedin_runner_module/temporal/updates/workflow-update-input.interface';
+import { setHandler } from '@temporalio/workflow';
 import {
-  actClickOnSelectorAndOpenNewPage,
+  actClickOnSelectorAndOpenAdditionalPage,
+  actCloseAdditionalPage,
   actExtractLinksFromSelector,
   actExtractSelectorContent,
   actExtractTextsFromSelector,
@@ -20,7 +23,6 @@ import {
   actScrollToTop,
   actWaitAndCheckIfSelectorExists,
   actWaitForSelector,
-  actCloseAdditionalPage,
 } from '../../temporal/activities/activities.export';
 
 export async function pageManipulationWorkflow({
@@ -29,38 +31,44 @@ export async function pageManipulationWorkflow({
   browserProfile: string;
 }): Promise<void> {
   const handlers = {
-    clickOnSelectorAndOpenNewPage: (input: ISelector) =>
-      actClickOnSelectorAndOpenNewPage(createActivityInput(browserProfile, input)),
-    closeAdditionalPage: (input: object) =>
+    clickOnSelectorAndOpenAdditionalPage: (input: IWorkflowUpdateInput<ISelector>) =>
+      actClickOnSelectorAndOpenAdditionalPage(createActivityInput(browserProfile, input)),
+    closeAdditionalPage: (input: IWorkflowUpdateInput<object>) =>
       actCloseAdditionalPage(createActivityInput(browserProfile, input)),
-    getCurrentUrl: (input: object) => actGetCurrentUrl(createActivityInput(browserProfile, input)),
-    reloadPage: (input: object) => actReloadPage(createActivityInput(browserProfile, input)),
-    extractLinksFromSelector: (input: ISelector) =>
+    getCurrentUrl: (input: IWorkflowUpdateInput<object>) =>
+      actGetCurrentUrl(createActivityInput(browserProfile, input)),
+    reloadPage: (input: IWorkflowUpdateInput<object>) =>
+      actReloadPage(createActivityInput(browserProfile, input)),
+    extractLinksFromSelector: (input: IWorkflowUpdateInput<ISelector>) =>
       actExtractLinksFromSelector(createActivityInput(browserProfile, input)),
-    extractSelectorContent: (input: ISelector) =>
+    extractSelectorContent: (input: IWorkflowUpdateInput<ISelector>) =>
       actExtractSelectorContent(createActivityInput(browserProfile, input)),
-    extractTextsFromSelector: (input: ISelector) =>
+    extractTextsFromSelector: (input: IWorkflowUpdateInput<ISelector>) =>
       actExtractTextsFromSelector(createActivityInput(browserProfile, input)),
-    goBack: (input: object) => actGoBack(createActivityInput(browserProfile, input)),
-    goToPage: (input: { page: string }) => actGoToPage(createActivityInput(browserProfile, input)),
-    moveCursorAndScrollRandomly: (input: object) =>
+    goBack: (input: IWorkflowUpdateInput<object>) =>
+      actGoBack(createActivityInput(browserProfile, input)),
+    goToPage: (input: IWorkflowUpdateInput<{ page: string }>) =>
+      actGoToPage(createActivityInput(browserProfile, input)),
+    moveCursorAndScrollRandomly: (input: IWorkflowUpdateInput<object>) =>
       actMoveCursorAndScrollRandomly(createActivityInput(browserProfile, input)),
-    moveCursorToSelectorAndClick: (input: ISelector) =>
+    moveCursorToSelectorAndClick: (input: IWorkflowUpdateInput<ISelector>) =>
       actMoveCursorToSelectorAndClick(createActivityInput(browserProfile, input)),
-    moveCursorToSelectorAndType: (input: { text: string } & ISelector) =>
+    moveCursorToSelectorAndType: (input: IWorkflowUpdateInput<ISelector & { text: string }>) =>
       actMoveCursorToSelectorAndType(createActivityInput(browserProfile, input)),
-    scroll: (input: object) => actScroll(createActivityInput(browserProfile, input)),
-    scrollToBottom: (input: object) =>
+    scroll: (input: IWorkflowUpdateInput<object>) =>
+      actScroll(createActivityInput(browserProfile, input)),
+    scrollToBottom: (input: IWorkflowUpdateInput<Partial<ISelector>>) =>
       actScrollToBottom(createActivityInput(browserProfile, input)),
-    scrollToTop: (input: object) => actScrollToTop(createActivityInput(browserProfile, input)),
-    waitAndCheckIfSelectorExists: (input: { timeout: number } & ISelector) =>
+    scrollToTop: (input: IWorkflowUpdateInput<object>) =>
+      actScrollToTop(createActivityInput(browserProfile, input)),
+    waitAndCheckIfSelectorExists: (input: IWorkflowUpdateInput<ITimeout & ISelector>) =>
       actWaitAndCheckIfSelectorExists(createActivityInput(browserProfile, input)),
-    waitForSelector: (input: { timeout: number } & ISelector) =>
+    waitForSelector: (input: IWorkflowUpdateInput<ITimeout & ISelector>) =>
       actWaitForSelector(createActivityInput(browserProfile, input)),
   };
 
   Object.entries(WORKFLOW_UPDATE).forEach(([key, update]) => {
-    setHandler(update, async (input: unknown) => {
+    setHandler(update, async (input: IWorkflowUpdateInput<unknown>) => {
       const result = await handlers[key as keyof typeof handlers](input as never);
       return result as string;
     });

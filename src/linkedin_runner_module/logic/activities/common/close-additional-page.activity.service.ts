@@ -1,29 +1,30 @@
 import { Activities, Activity } from 'nestjs-temporal';
 import { Injectable } from '@nestjs/common';
-import { BrowserService } from '@linkedin_runner_module/logic/features/browser.service';
-import { AdditionalPageService } from '@linkedin_runner_module/logic/features/additional-page.service';
 import { IBrowserProfileActivityInput } from '@linkedin_runner_module/interfaces/activities/common/browser-profile-activity-input.interface';
 import { PageManipulationService } from '@core_modules/puppeteer_module/page-manipulation.service';
+import { PageService } from '@linkedin_runner_module/modules/page_module/services/page.service';
+import { PAGE_TYPE } from '@linkedin_runner_module/constants/page-type';
 
 @Injectable()
 @Activities()
 export class CloseAdditionalPageActivity {
   constructor(
     private readonly pageManipulationService: PageManipulationService,
-    private readonly additionalPageService: AdditionalPageService,
-    private readonly browserService: BrowserService,
+    private readonly pageService: PageService,
   ) {}
 
   @Activity()
   public async actCloseAdditionalPage({
     browserProfile,
   }: IBrowserProfileActivityInput<object>): Promise<void> {
-    const { page } = await this.browserService.getPageAndCursor(browserProfile)!;
-    const additionalPage = this.additionalPageService.get(page);
+    const additionalPageAndCursor = await this.pageService.getPageAndCursor(
+      browserProfile,
+      PAGE_TYPE.additional,
+    );
 
-    if (additionalPage) {
-      await this.pageManipulationService.closePage(additionalPage);
-      this.additionalPageService.remove(additionalPage);
+    if (additionalPageAndCursor) {
+      await this.pageManipulationService.closePage(additionalPageAndCursor.page);
+      this.pageService.removeAdditionalPage(browserProfile);
     }
   }
 }
