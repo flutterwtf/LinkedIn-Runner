@@ -15,11 +15,13 @@ import { WaitAndCheckIfSelectorExistsActivity } from '@linkedin_runner_module/lo
 import { WaitForSelectorActivity } from '@linkedin_runner_module/logic/activities/wait/wait-for-selector.activity.service';
 import { ScrollToBottomActivity } from '@linkedin_runner_module/logic/activities/scroll/scroll-to-bottom.activity.service';
 import { ClickOnSelectorAndOpenAdditionalPageActivity } from '@linkedin_runner_module/logic/activities/common/click-on-selector-and-open-new-page.activity.service';
+import { MakeScreenshotActivity } from '@linkedin_runner_module/logic/activities/common/make-screenshot.activity.service';
 
 export const activitiesBundle = [
   ClickOnSelectorAndOpenAdditionalPageActivity,
   CloseAdditionalPageActivity,
   GetCurrentUrlActivity,
+  MakeScreenshotActivity,
   ReloadPageActivity,
   ExtractLinksFromSelectorActivity,
   ExtractSelectorContentActivity,

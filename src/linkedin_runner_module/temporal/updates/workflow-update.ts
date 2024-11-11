@@ -10,6 +10,7 @@ export const WORKFLOW_UPDATE = {
   ),
   closeAdditionalPage: defineUpdate<void, [IWorkflowUpdateInput<object>]>('closeAdditionalPage'),
   getCurrentUrl: defineUpdate<string, [IWorkflowUpdateInput<object>]>('getCurrentUrl'),
+  makeScreenshot: defineUpdate<void, [IWorkflowUpdateInput<object>]>('makeScreenshot'),
   reloadPage: defineUpdate<void, [IWorkflowUpdateInput<object>]>('reloadPage'),
   extractLinksFromSelector: defineUpdate<Array<string>, [IWorkflowUpdateInput<ISelector>]>(
     'extractLinksFromSelector',

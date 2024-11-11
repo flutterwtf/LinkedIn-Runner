@@ -14,6 +14,7 @@ import {
   actGetCurrentUrl,
   actGoBack,
   actGoToPage,
+  actMakeScreenshot,
   actMoveCursorAndScrollRandomly,
   actMoveCursorToSelectorAndClick,
   actMoveCursorToSelectorAndType,
@@ -37,6 +38,8 @@ export async function pageManipulationWorkflow({
       actCloseAdditionalPage(createActivityInput(browserProfile, input)),
     getCurrentUrl: (input: IWorkflowUpdateInput<object>) =>
       actGetCurrentUrl(createActivityInput(browserProfile, input)),
+    makeScreenshot: (input: IWorkflowUpdateInput<object>) =>
+      actMakeScreenshot(createActivityInput(browserProfile, input)),
     reloadPage: (input: IWorkflowUpdateInput<object>) =>
       actReloadPage(createActivityInput(browserProfile, input)),
     extractLinksFromSelector: (input: IWorkflowUpdateInput<ISelector>) =>
