@@ -4,7 +4,7 @@ import { BrowserConnectionService } from '@core_modules/puppeteer_module/browser
 import { IPageAndCursor } from '@linkedin_runner_module/interfaces/common/page-and-cursor.interface';
 
 @Injectable()
-export class BrowserService {
+export class OriginalPageService {
   private readonly connectionPool: Map<string, IPageAndCursor> = new Map();
 
   constructor(
@@ -12,7 +12,7 @@ export class BrowserService {
     private readonly browserConnectionService: BrowserConnectionService,
   ) {}
 
-  public async getPageAndCursor(browserProfile: string): Promise<IPageAndCursor> {
+  public async getPageAndCursorOrConnect(browserProfile: string): Promise<IPageAndCursor> {
     let pageAndCursor = this.connectionPool.get(browserProfile);
 
     const isPageClosed = !pageAndCursor || !pageAndCursor.page || pageAndCursor.page.isClosed();

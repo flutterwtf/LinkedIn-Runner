@@ -220,25 +220,51 @@ export class PageManipulationService {
     });
   }
 
-  public async scrollToBottom(page: Page): Promise<void> {
-    await page.evaluate(async () => {
-      const scrollCount = 3;
-      const scrollDelay = 500;
-      const scrollVariance = 300;
+  public async scrollToBottom(page: Page, selector?: string): Promise<void> {
+    await page.evaluate(
+      async (elementSelector?: string) =>
+        new Promise<void>((resolve) => {
+          if (!elementSelector) {
+            window.scrollTo({
+              top: document.body.scrollHeight,
+              behavior: 'smooth',
+            });
+            setTimeout(resolve, 1000);
+            return;
+          }
 
-      for (let i = 0; i < scrollCount; i += 1) {
-        window.scrollBy({
-          top: Math.round(
-            (Math.random() * document.body.scrollHeight) / 10 +
-              document.body.scrollHeight / scrollCount,
-          ),
-          behavior: 'smooth',
-        });
-        await new Promise((resolve) => {
-          setTimeout(resolve, scrollDelay + Math.random() * scrollVariance);
-        });
-      }
-    });
+          const element = document.querySelector(elementSelector)!;
+          if (!element) {
+            resolve();
+            return;
+          }
+
+          const currentPosition = element.scrollTop;
+          const targetPosition = element.scrollHeight;
+          const duration = Math.random() * 3000 + 3000;
+          const startTime = performance.now();
+
+          function smoothScroll(timestamp: number) {
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const ease =
+              progress < 0.5
+                ? 4 * progress * progress * progress
+                : 1 - (-2 * progress + 2) ** 3 / 2;
+
+            element.scrollTop = currentPosition + (targetPosition - currentPosition) * ease;
+
+            if (progress < 1) {
+              requestAnimationFrame(smoothScroll);
+            } else {
+              resolve();
+            }
+          }
+
+          requestAnimationFrame(smoothScroll);
+        }),
+      selector,
+    );
   }
 
   public async moveCursorToSelectorAndClick(
