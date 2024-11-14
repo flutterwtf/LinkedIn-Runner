@@ -1,20 +1,15 @@
 import { Page } from 'puppeteer-core';
 import { Injectable } from '@nestjs/common';
-import { IPageAndCursor } from '@linkedin_runner_module/interfaces/common/page-and-cursor.interface';
-import { GhostCursor } from 'ghost-cursor';
 
 @Injectable()
 export class AdditionalPageService {
-  private readonly additionalPages: Map<string, IPageAndCursor> = new Map();
+  private readonly additionalPages: Map<string, Page> = new Map();
 
   public add(browserProfile: string, additionalPage: Page): void {
-    this.additionalPages.set(browserProfile, {
-      page: additionalPage,
-      cursor: {} as GhostCursor,
-    });
+    this.additionalPages.set(browserProfile, additionalPage);
   }
 
-  public getPageAndCursor(browserProfile: string): IPageAndCursor | undefined {
+  public getPageAndCursor(browserProfile: string): Page | undefined {
     return this.additionalPages.get(browserProfile);
   }
 

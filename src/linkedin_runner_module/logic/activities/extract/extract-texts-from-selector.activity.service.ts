@@ -19,7 +19,7 @@ export class ExtractTextsFromSelectorActivity {
     pageType,
     input: { selector },
   }: IBrowserProfileActivityInput<ISelector>): Promise<Array<string>> {
-    const { page } = await this.pageService.getPageAndCursor(browserProfile, pageType);
+    const page = await this.pageService.getPageAndCursor(browserProfile, pageType);
     const result = await this.pageManipulationService.extractTextsFromSelector(page, selector);
 
     return result;

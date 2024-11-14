@@ -17,7 +17,7 @@ export class ScrollActivity {
     browserProfile,
     pageType,
   }: IBrowserProfileActivityInput<object>): Promise<number> {
-    const { page } = await this.pageService.getPageAndCursor(browserProfile, pageType);
+    const page = await this.pageService.getPageAndCursor(browserProfile, pageType);
     return this.pageManipulationService.scrollBy(page);
   }
 }

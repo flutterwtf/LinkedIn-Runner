@@ -22,7 +22,7 @@ export class WaitAndCheckIfSelectorExistsActivity {
     pageType,
     input: { selector, timeout = this.checkingExistenceTimeout },
   }: IBrowserProfileActivityInput<ISelector & ITimeout>): Promise<boolean> {
-    const { page } = await this.pageService.getPageAndCursor(browserProfile, pageType);
+    const page = await this.pageService.getPageAndCursor(browserProfile, pageType);
 
     return this.pageManipulationService.waitAndCheckIfSelectorExists({
       page,

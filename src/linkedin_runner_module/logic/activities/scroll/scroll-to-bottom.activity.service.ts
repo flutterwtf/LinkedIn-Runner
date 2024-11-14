@@ -19,7 +19,7 @@ export class ScrollToBottomActivity {
     pageType,
     input: { selector },
   }: IBrowserProfileActivityInput<Partial<ISelector>>): Promise<void> {
-    const { page } = await this.pageService.getPageAndCursor(browserProfile, pageType);
+    const page = await this.pageService.getPageAndCursor(browserProfile, pageType);
     return this.pageManipulationService.scrollToBottom(page, selector);
   }
 }

@@ -20,7 +20,7 @@ export class MoveCursorToSelectorAndTypeActivity {
     pageType,
     input: { selector, text },
   }: IBrowserProfileActivityInput<ISelector & IText>): Promise<void> {
-    const { page } = await this.pageService.getPageAndCursor(browserProfile, pageType);
+    const page = await this.pageService.getPageAndCursor(browserProfile, pageType);
     await this.pageManipulationService.moveCursorToSelectorAndType({
       page,
       selector,

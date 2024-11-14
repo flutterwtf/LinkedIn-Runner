@@ -22,7 +22,7 @@ export class WaitForSelectorActivity {
     pageType,
     input: { selector, timeout = this.waitingSelectorTimeout },
   }: IBrowserProfileActivityInput<ISelector & ITimeout>): Promise<void> {
-    const { page } = await this.pageService.getPageAndCursor(browserProfile, pageType);
+    const page = await this.pageService.getPageAndCursor(browserProfile, pageType);
     await this.pageManipulationService.waitForSelector({
       page,
       selector,

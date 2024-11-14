@@ -17,7 +17,7 @@ export class GetCurrentUrlActivity {
     browserProfile,
     pageType,
   }: IBrowserProfileActivityInput<object>): Promise<string> {
-    const { page } = await this.pageService.getPageAndCursor(browserProfile, pageType);
+    const page = await this.pageService.getPageAndCursor(browserProfile, pageType);
 
     return this.pageManipulationService.getCurrentUrl(page);
   }

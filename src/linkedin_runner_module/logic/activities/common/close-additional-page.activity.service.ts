@@ -17,13 +17,13 @@ export class CloseAdditionalPageActivity {
   public async actCloseAdditionalPage({
     browserProfile,
   }: IBrowserProfileActivityInput<object>): Promise<void> {
-    const additionalPageAndCursor = await this.pageService.getPageAndCursor(
+    const additionalPage = await this.pageService.getPageAndCursor(
       browserProfile,
       PAGE_TYPE.additional,
     );
 
-    if (additionalPageAndCursor) {
-      await this.pageManipulationService.closePage(additionalPageAndCursor.page);
+    if (additionalPage) {
+      await this.pageManipulationService.closePage(additionalPage);
       this.pageService.removeAdditionalPage(browserProfile);
     }
   }

@@ -18,7 +18,7 @@ export class GoToPageActivity {
     pageType,
     input: { page: url },
   }: IBrowserProfileActivityInput<{ page: string }>): Promise<void> {
-    const { page } = await this.pageService.getPageAndCursor(browserProfile, pageType);
+    const page = await this.pageService.getPageAndCursor(browserProfile, pageType);
     await this.pageManipulationService.goToPage(page, url);
   }
 }
