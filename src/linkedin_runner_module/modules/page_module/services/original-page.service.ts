@@ -1,4 +1,3 @@
-import { PageManipulationService } from '@core_modules/puppeteer_module/page-manipulation.service';
 import { Injectable } from '@nestjs/common';
 import { BrowserConnectionService } from '@core_modules/puppeteer_module/browser-connection.service';
 import { IPageAndCursor } from '@linkedin_runner_module/interfaces/common/page-and-cursor.interface';
@@ -8,10 +7,7 @@ import { GhostCursor } from 'ghost-cursor';
 export class OriginalPageService {
   private readonly connectionPool: Map<string, IPageAndCursor> = new Map();
 
-  constructor(
-    private readonly pageManipulationService: PageManipulationService,
-    private readonly browserConnectionService: BrowserConnectionService,
-  ) {}
+  constructor(private readonly browserConnectionService: BrowserConnectionService) {}
 
   public async getPageAndCursorOrConnect(browserProfile: string): Promise<IPageAndCursor> {
     let pageAndCursor = this.connectionPool.get(browserProfile);

@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import puppeteer, { Browser, Page } from 'puppeteer-core';
-import { CursorUtil } from './utils/cursor-util';
 import { VIEW_PORT } from './constants/view-port';
+import { MouseControlService } from './services/mouse/mouse-control.service';
 
 @Injectable()
 export class BrowserConnectionService {
   private readonly browserMap: Map<Page, Browser> = new Map();
 
-  constructor(private readonly cursorUtil: CursorUtil) {}
+  constructor(private readonly mouseControlService: MouseControlService) {}
 
   public async connect(profileId: string): Promise<Page> {
     const browser = await this.launchBrowser(profileId);
@@ -57,7 +57,7 @@ export class BrowserConnectionService {
       height,
       deviceScaleFactor,
     });
-    await this.cursorUtil.installMouseHelper(page);
+    await this.mouseControlService.setMouseCursor(page);
 
     return page;
   }

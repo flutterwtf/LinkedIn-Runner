@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Page } from 'puppeteer-core';
 
 @Injectable()
-export class CursorUtil {
+export class CursorService {
   public async installMouseHelper(page: Page): Promise<void> {
     await page.evaluateOnNewDocument(() => {
       if (window !== window.parent) {

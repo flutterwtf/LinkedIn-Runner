@@ -1,24 +1,21 @@
-export interface Point {
-  x: number;
-  y: number;
-}
+import { IPoint } from '@core_modules/puppeteer_module/interfaces/point.interface';
+import { Injectable } from '@nestjs/common';
 
-export class WindMouse {
+@Injectable()
+export class WindMouseService {
   private gravity = 14.5;
   private wind = 0.2;
-  private minWait = 2.0;
-  private maxWait = 5.0;
   private maxStep = 16.0;
   private targetArea = 6.0;
   private windX = 0.0;
   private windY = 0.0;
 
-  async generatePoints(
-    start: Point,
-    end: Point,
+  public async generatePoints(
+    start: IPoint,
+    end: IPoint,
     viewport: { width: number; height: number },
-  ): Promise<Point[]> {
-    const points: Point[] = [];
+  ): Promise<Array<IPoint>> {
+    const points: Array<IPoint> = [];
     let veloX = 0.0;
     let veloY = 0.0;
     const position = { ...start };
@@ -30,6 +27,7 @@ export class WindMouse {
     let lastPoint = { ...start };
     const minStepSize = 2.0;
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const dist = Math.sqrt((end.x - position.x) ** 2 + (end.y - position.y) ** 2);
 
@@ -102,8 +100,8 @@ export class WindMouse {
         lastPoint = { ...position };
       }
     }
-
     points.push({ ...end });
+
     return points;
   }
 }

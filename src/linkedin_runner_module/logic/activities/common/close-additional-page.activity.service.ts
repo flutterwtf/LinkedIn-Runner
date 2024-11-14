@@ -1,7 +1,7 @@
 import { Activities, Activity } from 'nestjs-temporal';
 import { Injectable } from '@nestjs/common';
 import { IBrowserProfileActivityInput } from '@linkedin_runner_module/interfaces/activities/common/browser-profile-activity-input.interface';
-import { PageManipulationService } from '@core_modules/puppeteer_module/page-manipulation.service';
+import { PageManipulationService } from '@core_modules/puppeteer_module/services/page-manipulation.service';
 import { PageService } from '@linkedin_runner_module/modules/page_module/services/page.service';
 import { PAGE_TYPE } from '@linkedin_runner_module/constants/page-type';
 

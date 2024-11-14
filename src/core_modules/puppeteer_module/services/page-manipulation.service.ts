@@ -1,11 +1,10 @@
-import { Injectable } from '@nestjs/common';
 import { generateRandomValue } from '@common/utils/generate-random-value';
+import { Injectable } from '@nestjs/common';
 import { Browser, ElementHandle, Page } from 'puppeteer-core';
-import { CursorUtil } from './utils/cursor-util';
-import { BrowserConnectionService } from './browser-connection.service';
-import { VIEW_PORT } from './constants/view-port';
-import { MouseControllerService } from './utils/mouse-controller.service';
-import { Point } from './utils/wind-mouse';
+import { BrowserConnectionService } from '../browser-connection.service';
+import { VIEW_PORT } from '../constants/view-port';
+import { MouseControlService } from './mouse/mouse-control.service';
+import { IPoint } from '../interfaces/point.interface';
 
 @Injectable()
 export class PageManipulationService {
@@ -14,9 +13,8 @@ export class PageManipulationService {
   private readonly checkingExistenceTimeout = 5000;
 
   constructor(
-    private readonly cursorUtil: CursorUtil,
     private readonly browserConnectionService: BrowserConnectionService,
-    private readonly mouseController: MouseControllerService,
+    private readonly mouseControlService: MouseControlService,
   ) {}
 
   public async clickOnSelectorAndOpenNewPage({
@@ -39,11 +37,7 @@ export class PageManipulationService {
   }
 
   public async reload(page: Page): Promise<void> {
-    const currentPosition = this.mouseController.getCurrentPosition();
-
     await page.reload({ waitUntil: ['domcontentloaded', 'load'] });
-
-    await page.mouse.move(currentPosition.x, currentPosition.y);
   }
 
   public async closePage(page: Page): Promise<void> {
@@ -183,12 +177,15 @@ export class PageManipulationService {
 
   public async moveCursorAndScrollRandomly(page: Page): Promise<void> {
     const { width, height } = VIEW_PORT;
-    const randomPoint: Point = {
+    const randomPoint: IPoint = {
       x: generateRandomValue(width),
       y: generateRandomValue(height),
     };
 
-    await this.mouseController.move(page, randomPoint);
+    await this.mouseControlService.move({
+      page,
+      target: randomPoint,
+    });
     await this.scrollBy(page);
   }
 
@@ -264,13 +261,20 @@ export class PageManipulationService {
     page: Page,
     selector: string | ElementHandle,
   ): Promise<void> {
-    await this.mouseController.move(page, selector, {
-      waitForSelector: this.waitingSelectorTimeout,
-      paddingPercentage: 99,
+    await this.mouseControlService.move({
+      page,
+      target: selector,
+      options: {
+        waitForSelector: this.waitingSelectorTimeout,
+        paddingPercentage: 99,
+      },
     });
-    await this.mouseController.click(page, undefined, {
-      waitForClick: generateRandomValue(100),
-      hesitate: generateRandomValue(100),
+    await this.mouseControlService.click({
+      page,
+      options: {
+        waitForClick: generateRandomValue(100),
+        hesitate: generateRandomValue(100),
+      },
     });
   }
 
@@ -306,8 +310,7 @@ export class PageManipulationService {
         deviceScaleFactor,
       });
 
-      await this.mouseController.setInitialPosition(newPage);
-      await this.cursorUtil.installMouseHelper(newPage);
+      await this.mouseControlService.setMouseCursor(newPage);
       await this.reload(newPage);
     } catch (err) {
       if (newPage) {

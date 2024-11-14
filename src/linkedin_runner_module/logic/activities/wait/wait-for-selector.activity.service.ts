@@ -3,7 +3,7 @@ import { IBrowserProfileActivityInput } from '@linkedin_runner_module/interfaces
 import { Activities, Activity } from 'nestjs-temporal';
 import { ISelector } from '@linkedin_runner_module/interfaces/common/selector.interface';
 import { ITimeout } from '@linkedin_runner_module/interfaces/common/timeout.interface';
-import { PageManipulationService } from '@core_modules/puppeteer_module/page-manipulation.service';
+import { PageManipulationService } from '@core_modules/puppeteer_module/services/page-manipulation.service';
 import { PageService } from '@linkedin_runner_module/modules/page_module/services/page.service';
 
 @Injectable()
