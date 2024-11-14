@@ -18,10 +18,9 @@ export class ClickOnSelectorAndOpenAdditionalPageActivity {
     browserProfile,
     input: { selector },
   }: IBrowserProfileActivityInput<ISelector>): Promise<void> {
-    const { page, cursor } = await this.pageService.getPageAndCursor(browserProfile);
+    const { page } = await this.pageService.getPageAndCursor(browserProfile);
     const additionalPage = await this.pageManipulationService.clickOnSelectorAndOpenNewPage({
       page,
-      cursor,
       selector,
     });
 

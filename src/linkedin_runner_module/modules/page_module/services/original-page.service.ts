@@ -2,6 +2,7 @@ import { PageManipulationService } from '@core_modules/puppeteer_module/page-man
 import { Injectable } from '@nestjs/common';
 import { BrowserConnectionService } from '@core_modules/puppeteer_module/browser-connection.service';
 import { IPageAndCursor } from '@linkedin_runner_module/interfaces/common/page-and-cursor.interface';
+import { GhostCursor } from 'ghost-cursor';
 
 @Injectable()
 export class OriginalPageService {
@@ -27,7 +28,7 @@ export class OriginalPageService {
     const page = await this.browserConnectionService.connect(browserProfile);
     this.connectionPool.set(browserProfile, {
       page,
-      cursor: this.pageManipulationService.createCursor(page),
+      cursor: {} as GhostCursor,
     });
 
     return this.connectionPool.get(browserProfile)!;

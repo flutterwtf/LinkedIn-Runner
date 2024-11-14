@@ -2,6 +2,7 @@ import { Page } from 'puppeteer-core';
 import { Injectable } from '@nestjs/common';
 import { IPageAndCursor } from '@linkedin_runner_module/interfaces/common/page-and-cursor.interface';
 import { PageManipulationService } from '@core_modules/puppeteer_module/page-manipulation.service';
+import { GhostCursor } from 'ghost-cursor';
 
 @Injectable()
 export class AdditionalPageService {
@@ -12,7 +13,7 @@ export class AdditionalPageService {
   public add(browserProfile: string, additionalPage: Page): void {
     this.additionalPages.set(browserProfile, {
       page: additionalPage,
-      cursor: this.pageManipulationService.createCursor(additionalPage),
+      cursor: {} as GhostCursor,
     });
   }
 
