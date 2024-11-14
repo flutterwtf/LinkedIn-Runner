@@ -20,8 +20,7 @@ export class ExtractSelectorContentActivity {
     input: { selector },
   }: IBrowserProfileActivityInput<ISelector>): Promise<string> {
     const page = await this.pageService.getPageAndCursor(browserProfile, pageType);
-    const content = await this.pageManipulationService.parseSelectorContent(page, selector);
 
-    return content;
+    return this.pageManipulationService.parseSelectorContent(page, selector);
   }
 }

@@ -20,8 +20,7 @@ export class ExtractLinksFromSelectorActivity {
     input: { selector },
   }: IBrowserProfileActivityInput<ISelector>): Promise<Array<string>> {
     const page = await this.pageService.getPageAndCursor(browserProfile, pageType);
-    const links = await this.pageManipulationService.extractLinksFromSelector(page, selector);
 
-    return links;
+    return this.pageManipulationService.extractLinksFromSelector(page, selector);
   }
 }
