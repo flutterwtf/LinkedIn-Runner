@@ -10,11 +10,7 @@ export class WindMouseService {
   private windX = 0.0;
   private windY = 0.0;
 
-  public async generatePoints(
-    start: IPoint,
-    end: IPoint,
-    viewport: { width: number; height: number },
-  ): Promise<Array<IPoint>> {
+  public async generatePoints(start: IPoint, end: IPoint): Promise<Array<IPoint>> {
     const points: Array<IPoint> = [];
     let veloX = 0.0;
     let veloY = 0.0;
@@ -68,28 +64,8 @@ export class WindMouseService {
         veloY = this.maxStep * Math.sign(veloY);
       }
 
-      const nextX = position.x + veloX;
-      const nextY = position.y + veloY;
-
-      if (nextX < 0) {
-        position.x = 0;
-        veloX = 0;
-      } else if (nextX > viewport.width) {
-        position.x = viewport.width;
-        veloX = 0;
-      } else {
-        position.x = nextX;
-      }
-
-      if (nextY < 0) {
-        position.y = 0;
-        veloY = 0;
-      } else if (nextY > viewport.height) {
-        position.y = viewport.height;
-        veloY = 0;
-      } else {
-        position.y = nextY;
-      }
+      position.x += veloX;
+      position.y += veloY;
 
       const distToLast = Math.sqrt(
         (position.x - lastPoint.x) ** 2 + (position.y - lastPoint.y) ** 2,

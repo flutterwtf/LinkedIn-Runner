@@ -44,6 +44,7 @@ export class MouseControlService {
     };
   }): Promise<void> {
     if (target) {
+      await this.ensureTargetVisibility(page, target);
       await this.move({
         page,
         target,
@@ -63,6 +64,33 @@ export class MouseControlService {
     }
   }
 
+  private async ensureTargetVisibility(
+    page: Page,
+    target: string | ElementHandle | IPoint,
+  ): Promise<void> {
+    if (typeof target === 'string' || target instanceof ElementHandle) {
+      const element = typeof target === 'string' ? await page.$(target) : target;
+
+      if (!element) {
+        throw new Error('Target element not found');
+      }
+
+      const isVisible = await element.isIntersectingViewport();
+
+      if (!isVisible) {
+        await element.evaluate((el) => {
+          el.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'center',
+          });
+        });
+
+        await setTimeout(generateRandomValue(1000));
+      }
+    }
+  }
+
   public async move({
     page,
     target,
@@ -78,17 +106,15 @@ export class MouseControlService {
     await this.setupMousePositionTracking(page);
     this.setupPageLoadHandler(page);
 
+    await this.ensureTargetVisibility(page, target);
+
     const targetPoint = await this.mouseTargetCalculationService.calcTargetPoint(
       page,
       target,
       options,
     );
     const currPosition = this.getCurrPosition(page);
-    const { width, height } = this.getViewport(page);
-    const points = await this.windMouseService.generatePoints(currPosition, targetPoint, {
-      width,
-      height,
-    });
+    const points = await this.windMouseService.generatePoints(currPosition, targetPoint);
 
     for (const { x, y } of points) {
       await page.mouse.move(x, y);
