@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PageManipulationService } from '@core_modules/puppeteer_module/page-manipulation.service';
+import { PageManipulationService } from '@core_modules/puppeteer_module/services/page-manipulation.service';
 import { IBrowserProfileActivityInput } from '@linkedin_runner_module/interfaces/activities/common/browser-profile-activity-input.interface';
 import { ISelector } from '@linkedin_runner_module/interfaces/common/selector.interface';
 import { Activities, Activity } from 'nestjs-temporal';
@@ -20,10 +20,9 @@ export class MoveCursorToSelectorAndTypeActivity {
     pageType,
     input: { selector, text },
   }: IBrowserProfileActivityInput<ISelector & IText>): Promise<void> {
-    const { page, cursor } = await this.pageService.getPageAndCursor(browserProfile, pageType);
+    const page = await this.pageService.getPageAndCursor(browserProfile, pageType);
     await this.pageManipulationService.moveCursorToSelectorAndType({
       page,
-      cursor,
       selector,
       text,
     });

@@ -1,4 +1,4 @@
-import { PageManipulationService } from '@core_modules/puppeteer_module/page-manipulation.service';
+import { PageManipulationService } from '@core_modules/puppeteer_module/services/page-manipulation.service';
 import { IBrowserProfileActivityInput } from '@linkedin_runner_module/interfaces/activities/common/browser-profile-activity-input.interface';
 import { ISelector } from '@linkedin_runner_module/interfaces/common/selector.interface';
 import { PageService } from '@linkedin_runner_module/modules/page_module/services/page.service';
@@ -19,9 +19,8 @@ export class ExtractLinksFromSelectorActivity {
     pageType,
     input: { selector },
   }: IBrowserProfileActivityInput<ISelector>): Promise<Array<string>> {
-    const { page } = await this.pageService.getPageAndCursor(browserProfile, pageType);
-    const links = await this.pageManipulationService.extractLinksFromSelector(page, selector);
+    const page = await this.pageService.getPageAndCursor(browserProfile, pageType);
 
-    return links;
+    return this.pageManipulationService.extractLinksFromSelector(page, selector);
   }
 }
