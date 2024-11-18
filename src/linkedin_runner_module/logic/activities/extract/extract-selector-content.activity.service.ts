@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PageManipulationService } from '@core_modules/puppeteer_module/page-manipulation.service';
+import { PageManipulationService } from '@core_modules/puppeteer_module/services/page-manipulation.service';
 import { IBrowserProfileActivityInput } from '@linkedin_runner_module/interfaces/activities/common/browser-profile-activity-input.interface';
 import { Activities, Activity } from 'nestjs-temporal';
 import { ISelector } from '@linkedin_runner_module/interfaces/common/selector.interface';
@@ -19,9 +19,8 @@ export class ExtractSelectorContentActivity {
     pageType,
     input: { selector },
   }: IBrowserProfileActivityInput<ISelector>): Promise<string> {
-    const { page } = await this.pageService.getPageAndCursor(browserProfile, pageType);
-    const content = await this.pageManipulationService.parseSelectorContent(page, selector);
+    const page = await this.pageService.getPageAndCursor(browserProfile, pageType);
 
-    return content;
+    return this.pageManipulationService.parseSelectorContent(page, selector);
   }
 }
