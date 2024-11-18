@@ -1,5 +1,8 @@
 import { generateRandomValue } from '@common/utils/generate-random-value';
+import { IClickOptions } from '@core_modules/puppeteer_module/interfaces/click-options.interface';
+import { IMoveOptions } from '@core_modules/puppeteer_module/interfaces/move-options.interface';
 import { IPoint } from '@core_modules/puppeteer_module/interfaces/point.interface';
+import { TTarget } from '@core_modules/puppeteer_module/types/target.type';
 import { Injectable } from '@nestjs/common';
 import { ElementHandle, Page, Viewport } from 'puppeteer-core';
 import { setTimeout } from 'timers/promises';
@@ -37,11 +40,8 @@ export class MouseControlService {
     options = {},
   }: {
     page: Page;
-    target?: string | ElementHandle | IPoint;
-    options: {
-      waitForClick?: number;
-      hesitate?: number;
-    };
+    target?: TTarget;
+    options?: IClickOptions;
   }): Promise<void> {
     if (target) {
       await this.ensureTargetVisibility(page, target);
@@ -64,10 +64,7 @@ export class MouseControlService {
     }
   }
 
-  private async ensureTargetVisibility(
-    page: Page,
-    target: string | ElementHandle | IPoint,
-  ): Promise<void> {
+  private async ensureTargetVisibility(page: Page, target: TTarget): Promise<void> {
     if (typeof target === 'string' || target instanceof ElementHandle) {
       const element = typeof target === 'string' ? await page.$(target) : target;
 
@@ -97,11 +94,8 @@ export class MouseControlService {
     options = {},
   }: {
     page: Page;
-    target: string | ElementHandle | IPoint;
-    options?: {
-      waitForSelector?: number;
-      paddingPercentage?: number;
-    };
+    target: TTarget;
+    options?: IMoveOptions;
   }): Promise<void> {
     await this.setupMousePositionTracking(page);
     this.setupPageLoadHandler(page);
@@ -113,13 +107,8 @@ export class MouseControlService {
       target,
       options,
     );
-    const currPosition = this.getCurrPosition(page);
-    const points = await this.windMouseService.generatePoints(currPosition, targetPoint);
-
-    for (const { x, y } of points) {
-      await page.mouse.move(x, y);
-      await setTimeout(generateRandomValue(2));
-    }
+    const movementPoints = this.generateMovementPoints(page, targetPoint);
+    await this.executeMouseMovement(page, movementPoints);
 
     this.pagePositions.set(page, targetPoint);
   }
@@ -151,6 +140,19 @@ export class MouseControlService {
     }
 
     return viewport;
+  }
+
+  private generateMovementPoints(page: Page, targetPoint: IPoint): Array<IPoint> {
+    const currPosition = this.getCurrPosition(page);
+
+    return this.windMouseService.generatePoints(currPosition, targetPoint);
+  }
+
+  private async executeMouseMovement(page: Page, points: Array<IPoint>): Promise<void> {
+    for (const { x, y } of points) {
+      await page.mouse.move(x, y);
+      await setTimeout(generateRandomValue(2));
+    }
   }
 
   private getCurrPosition(page: Page): IPoint {

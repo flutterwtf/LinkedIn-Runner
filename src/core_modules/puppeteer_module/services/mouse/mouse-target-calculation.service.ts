@@ -1,4 +1,6 @@
+import { IMoveOptions } from '@core_modules/puppeteer_module/interfaces/move-options.interface';
 import { IPoint } from '@core_modules/puppeteer_module/interfaces/point.interface';
+import { TTarget } from '@core_modules/puppeteer_module/types/target.type';
 import { Injectable } from '@nestjs/common';
 import { ElementHandle, Page } from 'puppeteer-core';
 
@@ -6,11 +8,8 @@ import { ElementHandle, Page } from 'puppeteer-core';
 export class MouseTargetCalculationService {
   public async calcTargetPoint(
     page: Page,
-    target: string | ElementHandle | IPoint,
-    options: {
-      waitForSelector?: number;
-      paddingPercentage?: number;
-    },
+    target: TTarget,
+    { waitForSelector, paddingPercentage }: IMoveOptions,
   ): Promise<IPoint> {
     if (this.isPoint(target)) {
       return target as IPoint;
@@ -18,8 +17,8 @@ export class MouseTargetCalculationService {
 
     let element: ElementHandle;
     if (typeof target === 'string') {
-      if (options.waitForSelector) {
-        await page.waitForSelector(target, { timeout: options.waitForSelector });
+      if (waitForSelector) {
+        await page.waitForSelector(target, { timeout: waitForSelector });
       }
       element = (await page.$(target))!;
     } else {
@@ -42,7 +41,7 @@ export class MouseTargetCalculationService {
       };
     }
 
-    const padding = options.paddingPercentage ? options.paddingPercentage / 100 : 0.1;
+    const padding = paddingPercentage ? paddingPercentage / 100 : 0.1;
     const minX = box.x + box.width * padding;
     const maxX = box.x + box.width * (1 - padding);
     const minY = box.y + box.height * padding;
@@ -54,7 +53,7 @@ export class MouseTargetCalculationService {
     };
   }
 
-  private isPoint(target: string | ElementHandle | IPoint): target is IPoint {
+  private isPoint(target: TTarget): target is IPoint {
     return typeof target === 'object' && 'x' in target && 'y' in target;
   }
 }
