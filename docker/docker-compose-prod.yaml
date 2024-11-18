@@ -12,7 +12,6 @@ services:
       context: ../
       dockerfile: docker/Dockerfile
     environment:
-      - ACCOUNT_TYPE=$ACCOUNT_TYPE
       - IPROYAL_API_KEY=$IPROYAL_API_KEY
       - TEMPORAL_GRPC_ENDPOINT=$TEMPORAL_GRPC_ENDPOINT
       - TEMPORAL_API_KEY=$TEMPORAL_API_KEY
