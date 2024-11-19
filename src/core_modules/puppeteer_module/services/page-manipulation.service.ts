@@ -11,6 +11,7 @@ export class PageManipulationService {
   private readonly navigationTimeout = 90000;
   private readonly waitingSelectorTimeout = 20000;
   private readonly checkingExistenceTimeout = 5000;
+  private readonly waitingRedirectTimeout = 3000;
 
   constructor(
     private readonly browserConnectionService: BrowserConnectionService,
@@ -45,7 +46,7 @@ export class PageManipulationService {
   }
 
   public async getCurrentUrl(page: Page): Promise<string> {
-    await page.waitForNetworkIdle();
+    await this.waitForRedirects(page);
 
     return page.url();
   }
@@ -355,5 +356,15 @@ export class PageManipulationService {
     const element = await page.$(selector);
 
     return element !== null;
+  }
+
+  private async waitForRedirects(page: Page): Promise<void> {
+    try {
+      await page.waitForNetworkIdle({
+        timeout: this.waitingRedirectTimeout,
+      });
+    } catch {
+      // Ignore network idle timeout errors
+    }
   }
 }
