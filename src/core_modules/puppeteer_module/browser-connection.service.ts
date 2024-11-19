@@ -11,9 +11,11 @@ export class BrowserConnectionService {
 
   public async connect(profileId: string): Promise<Page> {
     const browser = await this.launchBrowser(profileId);
-    await this.closeAllPages(browser);
 
-    return this.createPageAndSetToMap(browser);
+    const page = await this.createPageAndSetToMap(browser);
+    await this.closeAllUselessPages(browser);
+
+    return page;
   }
 
   public getBrowserByPage(page: Page): Browser | undefined {
@@ -40,11 +42,15 @@ export class BrowserConnectionService {
     });
   }
 
-  private async closeAllPages(browser: Browser): Promise<void> {
+  private async closeAllUselessPages(browser: Browser): Promise<void> {
     const pages = await browser.pages();
-    for (const page of pages) {
-      await page.close();
-    }
+    const pagesToClose = pages.slice(0, -1);
+
+    await Promise.all(
+      pagesToClose.map(async (page) => {
+        await page.close();
+      }),
+    );
   }
 
   private async createPageAndSetToMap(browser: Browser): Promise<Page> {
