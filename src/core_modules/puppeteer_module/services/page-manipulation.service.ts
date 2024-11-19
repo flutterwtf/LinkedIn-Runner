@@ -46,9 +46,7 @@ export class PageManipulationService {
   }
 
   public async getCurrentUrl(page: Page): Promise<string> {
-    await this.waitForRedirects(page);
-
-    return page.url();
+    return page.evaluate(() => window.location.href);
   }
 
   public async goToPage(page: Page, url: string): Promise<void> {
@@ -356,15 +354,5 @@ export class PageManipulationService {
     const element = await page.$(selector);
 
     return element !== null;
-  }
-
-  private async waitForRedirects(page: Page): Promise<void> {
-    try {
-      await page.waitForNetworkIdle({
-        timeout: this.waitingRedirectTimeout,
-      });
-    } catch {
-      // Ignore network idle timeout errors
-    }
   }
 }
