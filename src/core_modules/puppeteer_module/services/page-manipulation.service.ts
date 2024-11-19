@@ -44,7 +44,9 @@ export class PageManipulationService {
     return page.close();
   }
 
-  public getCurrentUrl(page: Page): string {
+  public async getCurrentUrl(page: Page): Promise<string> {
+    await page.waitForNetworkIdle();
+
     return page.url();
   }
 
