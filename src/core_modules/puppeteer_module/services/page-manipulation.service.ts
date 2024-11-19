@@ -11,7 +11,7 @@ export class PageManipulationService {
   private readonly navigationTimeout = 90000;
   private readonly waitingSelectorTimeout = 20000;
   private readonly checkingExistenceTimeout = 5000;
-  private readonly waitingRedirectTimeout = 3000;
+  private readonly waitingRedirectTimeout = 500;
 
   constructor(
     private readonly browserConnectionService: BrowserConnectionService,
@@ -46,7 +46,9 @@ export class PageManipulationService {
   }
 
   public async getCurrentUrl(page: Page): Promise<string> {
-    return page.evaluate(() => window.location.href);
+    await this.waitForRedirect(page);
+
+    return page.url();
   }
 
   public async goToPage(page: Page, url: string): Promise<void> {
@@ -354,5 +356,12 @@ export class PageManipulationService {
     const element = await page.$(selector);
 
     return element !== null;
+  }
+
+  private async waitForRedirect(page: Page): Promise<void> {
+    try {
+      await page.waitForNetworkIdle({ timeout: this.waitingRedirectTimeout });
+      // eslint-disable-next-line no-empty
+    } catch {}
   }
 }
