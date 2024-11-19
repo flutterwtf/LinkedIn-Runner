@@ -66,6 +66,9 @@ export class MouseControlService {
 
   private async ensureTargetVisibility(page: Page, target: TTarget): Promise<void> {
     if (typeof target === 'string' || target instanceof ElementHandle) {
+      if (typeof target === 'string') {
+        await page.waitForSelector(target, { timeout: 5000 });
+      }
       const element = typeof target === 'string' ? await page.$(target) : target;
 
       if (!element) {
