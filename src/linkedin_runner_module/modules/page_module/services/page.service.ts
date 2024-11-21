@@ -1,4 +1,5 @@
 import { PAGE_TYPE, TPageType } from '@linkedin_runner_module/constants/page-type';
+import { IPageAndCursor } from '@linkedin_runner_module/interfaces/common/page-and-cursor.interface';
 import { Injectable } from '@nestjs/common';
 import { Page } from 'puppeteer-core';
 import { AdditionalPageService } from './additional-page.service';
@@ -14,7 +15,7 @@ export class PageService {
   public async getPageAndCursor(
     browserProfile: string,
     pageType: TPageType = PAGE_TYPE.original,
-  ): Promise<Page> {
+  ): Promise<IPageAndCursor> {
     if (pageType === PAGE_TYPE.original) {
       return this.originalPageService.getPageAndCursorOrConnect(browserProfile);
     }
