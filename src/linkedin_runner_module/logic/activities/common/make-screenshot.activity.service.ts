@@ -17,7 +17,7 @@ export class MakeScreenshotActivity {
     browserProfile,
     pageType,
   }: IBrowserProfileActivityInput<object>): Promise<string> {
-    const page = await this.pageService.getPageAndCursor(browserProfile, pageType);
+    const { page } = await this.pageService.getPageAndCursor(browserProfile, pageType);
     const screenshot = await page.screenshot({ fullPage: true });
     const url = await this.awsService.uploadScreenshot({
       name: `${Date.now()}.png`,

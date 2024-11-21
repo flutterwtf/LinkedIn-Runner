@@ -1,10 +1,10 @@
-import { generateRandomValue } from '@common/utils/generate-random-value';
 import { Injectable } from '@nestjs/common';
+import { generateRandomValue } from '@common/utils/generate-random-value';
+import { GhostCursor, createCursor } from 'ghost-cursor';
 import { Browser, ElementHandle, Page } from 'puppeteer-core';
-import { BrowserConnectionService } from '../browser-connection.service';
-import { VIEW_PORT } from '../constants/view-port';
-import { MouseControlService } from './mouse/mouse-control.service';
-import { IPoint } from '../interfaces/point.interface';
+import { CursorUtil } from './utils/cursor-util';
+import { BrowserConnectionService } from './browser-connection.service';
+import { VIEW_PORT } from './constants/view-port';
 
 @Injectable()
 export class PageManipulationService {
@@ -14,22 +14,24 @@ export class PageManipulationService {
   private readonly waitingRedirectTimeout = 500;
 
   constructor(
+    private readonly cursorUtil: CursorUtil,
     private readonly browserConnectionService: BrowserConnectionService,
-    private readonly mouseControlService: MouseControlService,
   ) {}
 
   public async clickOnSelectorAndOpenNewPage({
     page,
+    cursor,
     selector,
   }: {
     page: Page;
+    cursor: GhostCursor;
     selector: string;
   }): Promise<Page> {
     const browser = this.browserConnectionService.getBrowserByPage(page)!;
 
     const newPage = await this.createNewPage({
       browser,
-      page,
+      cursor,
       selector,
     });
     await this.setupNewPage(newPage);
@@ -49,6 +51,13 @@ export class PageManipulationService {
     await this.waitForRedirect(page);
 
     return page.url();
+  }
+
+  public createCursor(page: Page): GhostCursor {
+    return createCursor(page, {
+      x: generateRandomValue(300),
+      y: generateRandomValue(500),
+    });
   }
 
   public async goToPage(page: Page, url: string): Promise<void> {
@@ -162,14 +171,16 @@ export class PageManipulationService {
 
   public async moveCursorToSelectorAndType({
     page,
+    cursor,
     selector,
     text,
   }: {
     page: Page;
+    cursor: GhostCursor;
     selector: string;
     text: string;
   }): Promise<void> {
-    await this.moveCursorToSelectorAndClick(page, selector);
+    await this.moveCursorToSelectorAndClick(cursor, selector);
     await this.clearInputElement(page, selector);
     await this.typeInElement({
       page,
@@ -178,17 +189,16 @@ export class PageManipulationService {
     });
   }
 
-  public async moveCursorAndScrollRandomly(page: Page): Promise<void> {
+  public async moveCursorAndScrollRandomly(page: Page, cursor: GhostCursor): Promise<void> {
     const { width, height } = VIEW_PORT;
-    const randomPoint: IPoint = {
-      x: generateRandomValue(width),
-      y: generateRandomValue(height),
-    };
+    await cursor.moveTo(
+      {
+        x: generateRandomValue(height),
+        y: generateRandomValue(width),
+      },
+      { randomizeMoveDelay: true },
+    );
 
-    await this.mouseControlService.move({
-      page,
-      target: randomPoint,
-    });
     await this.scrollBy(page);
   }
 
@@ -261,40 +271,36 @@ export class PageManipulationService {
   }
 
   public async moveCursorToSelectorAndClick(
-    page: Page,
+    cursor: GhostCursor,
     selector: string | ElementHandle,
   ): Promise<void> {
-    await this.mouseControlService.move({
-      page,
-      target: selector,
-      options: {
-        waitForSelector: this.waitingSelectorTimeout,
-        paddingPercentage: 99,
-      },
+    await cursor.move(selector, {
+      randomizeMoveDelay: true,
+      paddingPercentage: 99,
+      waitForSelector: this.waitingSelectorTimeout,
     });
-    await this.mouseControlService.click({
-      page,
-      options: {
-        waitForClick: generateRandomValue(100),
-        hesitate: generateRandomValue(100),
-      },
+    await cursor.click(selector, {
+      waitForClick: generateRandomValue(100),
+      hesitate: generateRandomValue(100),
+      paddingPercentage: 99,
+      waitForSelector: this.waitingSelectorTimeout,
     });
   }
 
   private async createNewPage({
     browser,
-    page,
+    cursor,
     selector,
   }: {
     browser: Browser;
-    page: Page;
+    cursor: GhostCursor;
     selector: string;
   }): Promise<Page> {
     const [newPage] = await Promise.all([
       new Promise<Page>((resolve) => {
         browser.once('targetcreated', async (target) => resolve((await target.page())!));
       }),
-      this.moveCursorToSelectorAndClick(page, selector),
+      this.moveCursorToSelectorAndClick(cursor, selector),
     ]);
 
     if (!newPage) {
@@ -312,8 +318,7 @@ export class PageManipulationService {
         height,
         deviceScaleFactor,
       });
-
-      await this.mouseControlService.setMouseCursor(newPage);
+      await this.cursorUtil.installMouseHelper(newPage);
       await this.reload(newPage);
     } catch (err) {
       if (newPage) {
